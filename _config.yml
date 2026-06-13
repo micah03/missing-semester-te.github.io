@@ -1,6 +1,7 @@
 # Setup
 title: 'Missing Semester'
-url: https://missing.csail.mit.edu
+url: "https://micah03.github.io"
+baseurl: "/missing-semester-te.github.io"
 thumbnail: "/static/assets/thumbnails/default.png"
 
 # Settings

@@ -9,7 +9,7 @@ description: >
 {% assign sorted_collections = site.collections | sort: 'label' | pop | reverse %}
 <ul>
 {% for collection in sorted_collections %}
-    <li><a href="/{{ collection.label }}/">{{ collection.label }}</a></li>
+  <li><a href="{{ site.baseurl }}/{{ collection.label }}/">{{ collection.label }}</a></li>
 {% endfor %}
 </ul>
 
