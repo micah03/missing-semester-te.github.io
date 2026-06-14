@@ -24,7 +24,9 @@ nositetitle: true
         <li>
         <strong>{{ lecture.date | date: '%-m/%-d/%y' }}</strong>:
         {% if lecture.ready %}
-            <a href="{{ lecture.url }}">{{ lecture.title }}</a>
+            <a href="https://missing.csail.mit.edu{{ lecture.url }}">
+  {{ lecture.title }} (English)
+</a>
         {% else %}
             {{ lecture.title }} {% if lecture.noclass %}[క్లాస్ లేదు]{% endif %}
         {% endif %}
@@ -47,7 +49,9 @@ nositetitle: true
             {% if lecture.special == true %}
                 <li>
                     <strong>{{ lecture.date | date: '%-m/%-d/%y' }}</strong>:
-                    <a href="{{ lecture.url }}">{{ lecture.title }}</a>
+                    <a href="https://missing.csail.mit.edu{{ lecture.url }}">
+  {{ lecture.title }} (English)
+</a>
                 </li>
             {% endif %}
         {% endfor %}

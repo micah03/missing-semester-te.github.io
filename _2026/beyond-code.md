@@ -2,7 +2,8 @@
 layout: lecture
 title: "Beyond the Code"
 description: >
-  Learn about essential soft skills including documentation, open-source community norms, and AI etiquette.
+  Documentation, Open Source Community Norms మరియు AI Etiquette వంటి ముఖ్యమైన Soft Skills గురించి తెలుసుకోండి.
+thumbnail: /static/assets/thumbnails/2026/lec8.png
 thumbnail: /static/assets/thumbnails/2026/lec8.png
 date: 2026-01-22
 ready: true
@@ -11,408 +12,772 @@ video:
   id: 2DOEATfXT8k
 ---
 
-Being a good software engineer isn't just about writing code that
-works. It's about writing code that others (including future you) can
-understand, maintain, and build upon. It's about communicating
-clearly, contributing thoughtfully, and being a good citizen in the
-ecosystems you participate in—whether open source or proprietary.
+మంచి Software Engineer కావడం అంటే కేవలం పనిచేసే code రాయడం మాత్రమే కాదు.
 
-# One-way communication
+ఇతరులు (భవిష్యత్తులోని మీరే అయినా సరే) అర్థం చేసుకోగలిగే, నిర్వహించగలిగే (maintain), మరియు దానిపై మరింత అభివృద్ధి చేయగలిగే (build upon) code ను రాయడం కూడా అంతే ముఖ్యమైనది.
 
-Much of software engineering involves writing for people who lack your
-current context: teammates who join later, maintainers who inherit
-your code, or yourself in six months when you've forgotten why you
-made a particular choice. A key piece of advice for all this kind of
-writing is that your goal is to capture and convey the *why*, not just
-the *what*. The what tends to be self-explanatory, while the *why* is
-hard-earned knowledge that is easily lost to time.
+అలాగే, స్పష్టంగా కమ్యూనికేట్ చేయడం, ఆలోచనాత్మకంగా సహకరించడం (contribute thoughtfully), మరియు మీరు భాగస్వామ్యం చేసే ecosystems లో — అవి Open Source అయినా Proprietary అయినా — బాధ్యతగల సభ్యుడిగా (good citizen) వ్యవహరించడం కూడా Software Engineering లో ఒక ముఖ్యమైన భాగం.
 
-Perhaps the most common form of engineer-to-engineer communication
-(apart from the code itself) is code comments. I've personally found
-that a lot of code comments are useless. But they don't have to be! Good
-comments explain things that the code itself cannot: *why* something is
-done a particular way, not *how* it works (which is what the code
-shows). They can save hours of confusion, while bad comments add noise
-or, worse, mislead.
+# ఏకదిశ Communication (One-way Communication)
 
-Types of comments that are nearly always worthwhile:
+Software Engineering లో ఎక్కువ భాగం, ప్రస్తుతం మీకు ఉన్న context లేని వ్యక్తుల కోసం రాయడంలో ఉంటుంది. ఉదాహరణకు:
 
-- **TODOs**: Mark incomplete or unpolished code, but leave enough
-  context for someone else to understand what's outstanding and why it
-  was deferred. "TODO: optimize" is useless; "TODO: this O(n²) loop is
-  fine for `n<100`, but will need indexing if we scale" is actionable.
-- **References**: Link to external sources when code implements an
-  algorithm from a paper, adapts code from elsewhere, or encodes
-  behaviour specified in documentation. Use permalinks. Note any
-  divergences from the reference.
-- **Correctness arguments**: Explain *why* non-trivial code produces
-  correct results. The code shows the steps; a comment explains why
-  those steps work.
-- **Hard-learned lessons**: If you spent 30+ minutes debugging something
-  and the fix is a non-obvious incantation, document it. Your past self
-  didn't realize it was needed; future readers won't either.
-- **Rationale for constants**: Magic numbers deserve explanation. Why
-  1492? Why 16 bits? Was it chosen randomly, derived from testing, or
-  required for correctness? Even "chosen arbitrarily" is useful
-  information.
-- **Load-bearing choices**: If correctness depends on a
-  seemingly-innocent implementation detail (e.g., "must be a BTreeSet
-  because iteration order matters below"), call it out explicitly.
-- **"Why not"s**: When you deliberately avoid the obvious approach,
-  explain why. Otherwise someone will "fix" it later and break things.
+- తర్వాత join అయ్యే teammates
+- మీ code ను maintain చేసే maintainers
+- లేదా ఆరు నెలల తర్వాత, మీరు ఒక నిర్ణయం ఎందుకు తీసుకున్నారో మర్చిపోయే మీరే
 
-READMEs (you have one, right?) are also a common first touch-point with
-other developers. A good one answers four questions immediately: What
-does this do? Why should I care? How do I use it? How do I install it?
-In that order. Structure it like a funnel: a one-liner and maybe a
-visual demo at the top so someone can decide in seconds if this solves
-their problem, then progressively add depth. Show usage before
-installation — people want to see what they're getting before committing
-to setup steps.
+ఈ రకమైన writing లో గుర్తుంచుకోవాల్సిన ముఖ్యమైన సలహా ఏమిటంటే, మీ లక్ష్యం కేవలం *what* ను మాత్రమే కాకుండా *why* ను కూడా నమోదు చేసి తెలియజేయడం కావాలి.
 
-Commit messages are another kind of "writing for others" that is often
-neglected. They are often written as "fixed blah" or "added foo", and
-while that may be sufficient in some cases, it's easy to forget that
-they form the historical record of *why* the codebase evolved the way it
-did. When someone (including you!) runs `git blame` trying to understand
-a confusing change, good commit messages should give them answers.
+*What* అనేది సాధారణంగా స్వయంగా అర్థమవుతుంది. కానీ *why* అనేది కష్టపడి సంపాదించిన జ్ఞానం (hard-earned knowledge), కాలక్రమేణా సులభంగా కనుమరుగైపోతుంది.
 
-In general, the body should answer:
-- What problem forced this change?
-- What alternatives did you consider?
-- What are the trade-offs or implications?
-- What might be surprising about this approach?
+Engineer-to-engineer communication లో (code ను మినహాయిస్తే), అత్యంత సాధారణ రూపం code comments.
 
-> Obviously you should scale detail with complexity. A one-line typo fix
-> needs only a subject. A subtle race condition fix that took hours to
-> debug deserves paragraphs explaining the problem and solution.
+వ్యక్తిగతంగా చూస్తే, చాలా code comments ఉపయోగం లేనివిగా ఉంటాయి. కానీ అవి అలా ఉండాల్సిన అవసరం లేదు!
 
-For complex changes, it can be useful to follow a Problem → Solution →
-Implications structure: Start with the forcing function or limitation,
-then explain what changed and the key design decisions, and then list
-noteworthy consequences (positive and negative). That last part is
-particularly important; real engineering involves balancing concerns,
-and documenting that a trade-off was intentional prevents future
-developers from thinking you missed the problem.
+మంచి comments, code స్వయంగా వివరించలేని విషయాలను వివరిస్తాయి: ఏదైనా పని *ఎలా* జరుగుతుందో కాదు, అది *ఎందుకు* ఆ విధంగా చేయబడిందో.
 
-LLMs _can_ be helpful in writing commit messages. However, if you simply
-point one at your change and ask it to write the commit message for the
-change, the LLM will only have access to the _what_, not the _why_. And
-the resulting commit message will thus be mostly descriptive (the
-opposite of what we want!). If you used an LLM to help you make the
-change in the first place, asking the LLM to write the commit in that
-same session can be a much better option since your conversation with
-the LLM is inherently a rich source of context about the change!
-Otherwise, or in addition, a useful trick is to specifically tell the
-LLM you'd like a commit message focused on the "why" (and other nuances
-from the notes above), and then _tell it to query you for missing
-context_. Essentially, you're acting like a MCP "tool" for the coding
-agent that it can use to "read" context.
+Code ఇప్పటికే *how* ను చూపిస్తుంది. Comment యొక్క పని *why* ను వివరించడం.
 
-As your changes get more complex, make sure to also break up commits
-logically (`git add -p` is your friend). Each commit should represent
-one coherent change that could be understood and reviewed independently.
-Don't mix refactoring with new features or combine unrelated bug fixes,
-as this muddies the story for which changes fixed what problem, and will
-almost certainly slow down the eventual review of your changes. It also
-gives you superpowers through `git bisect`, but that's a story for
-another time.
+మంచి comments గంటల కొద్దీ అయోమయాన్ని నివారించగలవు. చెడు comments మాత్రం అనవసరమైన noise ను జోడిస్తాయి లేదా అంతకంటే చెడ్డగా, తప్పుదారి పట్టిస్తాయి.
 
-> One note as you start being more diligent about technical writing, and
-> using it more extensively, make sure you respect the reader. It's easy
-> to end up over-explaining once you start, but you have to resist that
-> urge lest the reader read _none_ of what you've written. Explain the
-> "why" and trust them to figure out the "how" for their situation.
+దాదాపు ఎల్లప్పుడూ విలువైన comment రకాలలో కొన్ని:
 
-# Collaboration
+- **TODOs**: పూర్తికాని లేదా ఇంకా మెరుగుపరచాల్సిన code ను గుర్తించడానికి ఉపయోగించండి. అయితే, మిగిలి ఉన్న పని ఏమిటో మరియు దాన్ని ఎందుకు వాయిదా వేశారో మరొకరికి అర్థమయ్యేంత context ఇవ్వండి. `"TODO: optimize"` అనేది ఉపయోగం లేని వ్యాఖ్య. కానీ `"TODO: ఈ O(n²) loop ప్రస్తుతం `n<100` కోసం సరిపోతుంది. Scale పెరిగితే indexing అవసరం అవుతుంది"` అనేది అమలు చేయగలిగే (actionable) వ్యాఖ్య.
 
-As engineers, we may spend a large part of our job coding at our own
-keyboard, but a sizeable chunk of our time is also taken up by
-communicating with others. That time is usually split into collaboration
-and education, and the payoff from investing in getting better at both is
-significant.
+- **References**: Code ఒక research paper లోని algorithm ను అమలు చేస్తే, ఇతర చోట్ల నుంచి code ను adapt చేస్తే, లేదా documentation లో పేర్కొన్న behaviour ను అనుసరిస్తే, సంబంధిత external sources కు links ఇవ్వండి. Permalinks ఉపయోగించండి. Reference తో పోలిస్తే ఉన్న తేడాలను కూడా నమోదు చేయండి.
 
-## Contributing
+- **Correctness Arguments**: క్లిష్టమైన (non-trivial) code సరైన ఫలితాలను ఎందుకు ఇస్తుందో వివరించండి. Code steps ను చూపిస్తుంది; comment ఆ steps ఎందుకు పనిచేస్తాయో వివరిస్తుంది.
 
-Whether you are submitting a bug report, contributing a simple bug fix,
-or implementing a huge feature, it's worth keeping in mind that there
-are usually orders of magnitude more users than there are contributors,
-and an order of magnitude more contributors than there are maintainers.
-As a result, maintainer time is highly oversubscribed. If you want to
-increase the likelihood that your contribution goes somewhere
-productive, you have to ensure that your contributions carry a high
-signal-to-noise ratio and are worth the maintainers' time.
+- **Hard-Learned Lessons**: మీరు ఏదైనా సమస్యను debug చేయడానికి 30 నిమిషాలకంటే ఎక్కువ సమయం వెచ్చించి, దానికి పరిష్కారం ఒక non-obvious trick లేదా workaround అయితే, దాన్ని document చేయండి. మీ గతంలోని మీరు దాని అవసరాన్ని గుర్తించలేదు; భవిష్యత్తులో చదివేవారు కూడా గుర్తించకపోవచ్చు.
 
-For example, a good bug report respects the maintainer's time by
-providing everything needed to understand and reproduce the problem:
+- **Constants వెనుక కారణం**: Magic numbers కు వివరణ అవసరం. ఎందుకు 1492? ఎందుకు 16 bits? అది యాదృచ్ఛికంగా (randomly) ఎంచుకున్నదా, testing ద్వారా నిర్ణయించబడిందా, లేదా correctness కోసం తప్పనిసరిగా అవసరమా? `"arbitrarily chosen"` అనే వివరణ కూడా ఉపయోగకరమైన సమాచారమే.
 
-- **Environment**: OS, version numbers, relevant configuration
-- **What you expected** vs **what actually happened**
-- **Steps to reproduce**: Be specific. "Click the button" is less useful
-  than "Click the Submit button on the /settings page while logged in as
-  an admin."
-- **What you've already tried**: This prevents duplicate suggestions and
-  shows you've done some investigation
+- **ముఖ్యమైన Implementation Decisions**: Correctness ఒక సాధారణంగా కనిపించే implementation detail పై ఆధారపడి ఉంటే (ఉదాహరణకు, `"ఇక్కడ BTreeSet తప్పనిసరి, ఎందుకంటే కింద iteration order ముఖ్యం"`), దాన్ని స్పష్టంగా పేర్కొనండి.
 
-> If you find a security vulnerability, don't post it publicly. Contact
-> the maintainers privately first and give them reasonable time to fix
-> it before disclosure. Many projects have a SECURITY.md file or
-> similar for this purpose.
+- **"Why Not" Comments**: స్పష్టంగా కనిపించే solution ను మీరు ఉద్దేశపూర్వకంగా ఉపయోగించకపోతే, ఎందుకు ఉపయోగించలేదో వివరించండి. లేకపోతే భవిష్యత్తులో ఎవరైనా దాన్ని "సరిచేయడానికి" ప్రయత్నించి వ్యవస్థను పాడుచేయవచ్చు.
 
-**Make sure you search for existing issues.** Your bug or feature
-request may already be reported, and it's far better to add information
-to existing discussions rather than creating duplicates. Not to mention,
-it reduces noise for the maintainers.
+READMEలు (మీ దగ్గర ఒకటి ఉందిగా?) కూడా ఇతర developers తో మొదటి పరిచయ బిందువులలో (first touch-points) ఒకటి.
 
-Minimal reproducible examples are gold, if you can come up with one.
-They save the maintainer a huge amount of time and effort, and
-reliably reproducing the bug is often the hardest part of fixing it. Not
-to mention, the effort you put into isolating the problem often helps
-you understand it better too, and sometimes leads you to find a fix
-yourself.
+ఒక మంచి README ఈ నాలుగు ప్రశ్నలకు వెంటనే సమాధానం ఇవ్వాలి:
 
-If you don't hear back right away, keep in mind that maintainers are
-often volunteers with limited time. If you're waiting for a reply from
-them, a polite follow-up after a couple weeks is fine; daily pings are
-not. Similarly, "me too" comments, or bug reports that are just a
-copy-paste of some terminal output tend to be a net-negative in terms of
-getting traction for your issue.
+1. ఇది ఏమి చేస్తుంది?
+2. నేను దీనిని ఎందుకు పట్టించుకోవాలి?
+3. దీన్ని ఎలా ఉపయోగించాలి?
+4. దీన్ని ఎలా install చేయాలి?
 
-If you're looking to make a code contribution, you'll also want to
-familiarize yourself with the contribution guidelines. Many projects
-have a `CONTRIBUTING.md` — follow it. You'll also usually want to start
-small; a typo fix or documentation improvement is a great first
-contribution as it helps you learn the project's processes without also
-having to go through lots of back and forth on the content.
+అదే క్రమంలో.
 
-> Check what license the project uses, as any code you contribute will
-> fall under the same license. In particular, look out for copyleft
-> licenses (like GPL), which requires derivatives to also be open source
-> and may have implications for your employer if you touch it!
-> [choosealicense.com](https://choosealicense.com/) has more useful
-> information.
+README ను ఒక funnel లాగా రూపొందించండి. పైభాగంలో ఒక చిన్న పరిచయం (one-liner) మరియు సాధ్యమైతే ఒక visual demo ఉంచండి. అలా చేస్తే, ఇది తమ సమస్యను పరిష్కరిస్తుందో లేదో ఎవరైనా కొన్ని సెకన్లలోనే నిర్ణయించగలరు.
 
-When you've decided to open a pull request ("PR"), first make sure you
-isolate the change you actually want to be accepted. If your PR changes
-lots of other unrelated things at the same time, chances are the
-reviewer will send it back to you asking you to clean it up. This is
-similar to how you should break down your git commits into semantically
-related chunks.
+ఆ తర్వాత క్రమంగా మరింత వివరాలను జోడించండి.
 
-In some cases, if you have many seemingly-disparate changes but
-they're all needed to enable one feature, it may be okay to open a
-larger PR that captures all the changes. However, in this case, commit
-hygiene is particularly important so that maintainers have the option
-to review the change "commit by commit".
+Installation సూచనల కంటే ముందు usage ను చూపించండి — setup కోసం సమయం వెచ్చించే ముందు, వారు ఏమి పొందబోతున్నారో తెలుసుకోవాలనుకుంటారు.
 
-Next, make sure you explain the "why" behind the change well. Don't just
-describe _what_ changed — explain _why_ the change is needed and _why_
-this is a good way to address the problem. You should also proactively
-call out parts of the change that warrant special attention in the
-review, if any. Depending on `CONTRIBUTING.md` and the nature of your
-change, reviewers may also expect to see additional information like
-trade-offs you made or how to test the change.
+Commit messages కూడా "ఇతరుల కోసం రాయడం" అనే వర్గానికి చెందినవే. కానీ చాలా సందర్భాల్లో అవి నిర్లక్ష్యం చేయబడతాయి.
 
-> We recommend contributing back to upstream projects rather than
-> "forking" the project, at least as a first approach. Forking (license
-> permitting) should be reserved for when the contributions you want to
-> make are out of scope for the original project. If you do fork, make
-> sure you acknowledge the original project!
+చాలా commit messages `"fixed blah"` లేదా `"added foo"` వంటి రూపంలో ఉంటాయి. కొన్ని సందర్భాల్లో అది సరిపోవచ్చు. అయితే, codebase కాలక్రమేణా *ఎందుకు* ఆ విధంగా అభివృద్ధి చెందిందో తెలిపే చారిత్రక రికార్డు (historical record) గా commit messages పనిచేస్తాయని మర్చిపోవడం సులభం.
 
-AI makes it incredibly easy to generate plausible-looking code and PRs
-quickly, but this doesn't excuse you from understanding what you're
-contributing. Submitting AI-generated code you can't explain burdens
-maintainers with reviewing and potentially maintaining code that even
-its author doesn't understand. It's fine to use AI to help you
-identify issues and produce fixes/features, **so long as you still do
-the due diligence** to polish it into a worthwhile contribution, rather
-than passing that work on to the (already-overloaded) maintainers.
+ఎప్పుడైనా ఎవరైనా (మీరే అయినా సరే) ఒక గందరగోళమైన మార్పు వెనుక కారణాన్ని తెలుసుకోవడానికి `git blame` ఉపయోగిస్తే, మంచి commit messages వారికి సమాధానాలు ఇవ్వగలగాలి.
 
-Remember that for maintainers, accepting a PR means accepting long-term
-responsibility. They will be maintaining this code long after the
-contributor has moved on, and so may decline changes that are
-well-intentioned but don't fit the project's direction, add complexity
-they don't want to maintain, or where the need simply isn't sufficiently
-well-documented. It's on _you_ as the contributor to make the case for
-why accepting the contribution is worth the maintenance burden.
+సాధారణంగా, commit message యొక్క body ఈ ప్రశ్నలకు సమాధానం ఇవ్వాలి:
 
-> When receiving feedback on a PR, remember that your code is not you!
-> Reviewers are trying to make the code better, not criticizing you
-> personally. Ask clarifying questions if you disagree — you might learn
-> something, or maybe they will.
+- ఈ మార్పు చేయాల్సిన అవసరం ఏ సమస్య వల్ల వచ్చింది?
+- మీరు పరిగణించిన ప్రత్యామ్నాయాలు (alternatives) ఏమిటి?
+- ఇందులో ఉన్న trade-offs లేదా implications ఏమిటి?
+- ఈ విధానంలో (approach) ఆశ్చర్యపరిచే లేదా వెంటనే అర్థంకాని అంశాలు ఏమైనా ఉన్నాయా?
 
-## Reviewing
+> వివరాల పరిమాణం (level of detail) మార్పు యొక్క క్లిష్టతకు (complexity) అనుగుణంగా ఉండాలి. ఒక line లోని typo ను సరిచేసే commit కు subject మాత్రమే సరిపోతుంది. కానీ debug చేయడానికి గంటల సమయం పట్టిన ఒక క్లిష్టమైన race condition fix కు, సమస్య ఏమిటి మరియు దాన్ని ఎలా పరిష్కరించారో వివరించే అనేక పేరాలు (paragraphs) అవసరం.
 
-You might think code review is something senior developers do, but
-you'll likely be asked to review code much earlier than you expect, and
-your perspective is valuable. Fresh eyes catch things that experienced
-developers overlook, and questions from someone less familiar with the
-code often reveal assumptions that should be documented or simplified.
+క్లిష్టమైన మార్పుల (complex changes) కోసం, **Problem → Solution → Implications** అనే నిర్మాణాన్ని అనుసరించడం ఉపయోగకరంగా ఉంటుంది.
 
-Review is also one of the fastest ways to learn. You'll see how others
-approach problems, pick up patterns and idioms, and develop intuition
-for what makes code readable. Beyond personal growth, reviews catch bugs
-before they reach production, spread knowledge across the team, and
-improve code quality through collaboration. They are not merely
-bureaucratic overhead.
+మొదట, ఈ మార్పు అవసరమయ్యేలా చేసిన సమస్య లేదా పరిమితి (limitation) ఏమిటో వివరించండి.
 
-Good code review is a skill you need to hone over time, but there are
-some tips that can make them much better much faster:
+తర్వాత:
 
-- **Review the code, not the person**:
-  "This function is confusing" vs "You wrote confusing code."
-- **Prefer actionable comments**:
-  "Can you replace these globals with a config dataclass" is an easier
-  comment to address than "Don't use globals here"
-- **Ask questions rather than making demands**:
-  "What happens if X is null here?" invites discussion better than
-  "Handle the null case."
-- **Explain the "why"**:
-  "Consider using a constant here" is less useful than "Consider using a
-  constant here so we can easily adjust the timeout based on
-  environment."
-- **Distinguish blocking issues from suggestions**:
-  Be clear about what must change versus what's a matter of preference.
-- **Acknowledge what's good**:
-  Pointing out clever solutions or clean implementations is encouraging
-  and helps the author know what to continue doing.
-- **Know when to stop**:
-  Contributors only have so much time and patience, and it's not always
-  best spent handling all the nits. Focus on the big things, and
-  consider tidying up nits yourself after the fact.
+- ఏమి మార్చారో
+- ముఖ్యమైన design decisions ఏమిటో
 
-> AI tools can catch certain issues, but they're not a substitute for
-> human review. They miss context, don't understand product
-> requirements, and can confidently suggest wrong things. They're worth
-> using as a first pass, but not a replacement for thoughtful human
-> review.
+వివరించండి.
 
-# Education
+చివరగా, ఈ మార్పు వల్ల కలిగే ముఖ్యమైన ప్రభావాలను (consequences) — సానుకూలమైనవి మరియు ప్రతికూలమైనవి రెండూ — జాబితా చేయండి.
 
-A lot of our non-coding time as engineers is spent either asking or
-answering questions, possibly a mixture of both; during collaboration,
-in dialogue with peers, or while trying to learn. Asking good questions
-is a skill that makes you better at learning from anyone, not just
-perfect explainers. Julia Evans has some excellent blog posts on "[How
-to ask good questions](https://jvns.ca/blog/good-questions/)" and "[How
-to get useful answers to your
-questions](https://jvns.ca/blog/2021/10/21/how-to-get-useful-answers-to-your-questions/)"
-that are worth reading.
+ఈ చివరి భాగం ప్రత్యేకంగా ముఖ్యమైనది. నిజమైన engineering అనేది వివిధ అవసరాల మధ్య సమతుల్యత (balancing concerns) సాధించడం గురించి ఉంటుంది. ఒక trade-off ఉద్దేశపూర్వకంగా తీసుకున్న నిర్ణయం అని document చేయడం వల్ల, భవిష్యత్తు developers మీరు ఆ సమస్యను గమనించలేదని అనుకోకుండా ఉంటుంది.
 
-Some particularly valuable pieces of advice are:
+LLMs commit messages రాయడంలో సహాయపడగలవు.
 
-- **State your understanding first**: Say what you think you know and
-  ask "is that right?" This helps the answerer identify your actual
-  knowledge gaps.
-- **Ask yes/no questions**: "Is X true?" prevents tangential
-  explanations and usually prompts useful elaboration anyway.
-- **Be specific**: "How do SQL joins work?" is too vague. "Does a LEFT
-  JOIN include rows where the right table has no match?" is answerable.
-- **Admit when you don't understand**: Interrupt to ask about unfamiliar
-  terms. This reflects confidence, not weakness. Similarly, if they ask
-  questions of you that you do not know the answer to, it's best to say
-  "I don't know", and possibly follow up with "but I think ..." or even
-  "but I can find out".
-- **Don't accept incomplete answers**: Keep asking follow-ups until you
-  actually understand.
-- **Do some research first**: Basic investigation helps you ask more
-  targeted questions (though casual questions among colleagues are
-  fine).
+అయితే, మీరు కేవలం ఒక code change ను LLM కు చూపించి, దాని కోసం commit message రాయమని అడిగితే, LLM కు *what* మాత్రమే తెలుస్తుంది; *why* తెలియదు.
 
-Remember: well-crafted questions benefit entire communities. They
-surface hidden assumptions that others need to understand too.
+దాంతో, అది రూపొందించే commit message ప్రధానంగా మార్పులను వివరిస్తుంది (descriptive). కానీ మనకు కావాల్సింది అదే కాదు.
 
-> Note that this advice applies just as much when communicating with
-> LLMs!
+మీరు ఆ మార్పును చేయడానికి మొదటినుంచే LLM సహాయాన్ని ఉపయోగించి ఉంటే, అదే conversation లో commit message కూడా రాయమని అడగడం చాలా మంచి ఎంపిక.
 
-# AI etiquette
+ఎందుకంటే:
 
-With the growing use of LLMs and AI across software engineering, the
-social and professional norms around are still in flux. We already
-covered many of the tactical considerations in the [agentic coding
-lecture](/2026/agentic-coding/), but there are also "softer" parts of
-their use that are worth discussing.
+- ఆ conversation లో ఇప్పటికే మార్పు వెనుక ఉన్న reasoning ఉంటుంది
+- తీసుకున్న నిర్ణయాల గురించి context ఉంటుంది
+- సమస్య మరియు పరిష్కారం గురించి చర్చ ఉంటుంది
 
-The first of these is that when AI meaningfully contributed to your
-work, **disclose it**. This isn't about shame — it's about honesty,
-setting appropriate expectations, and ensuring the resulting work gets
-the appropriate level of review. It's also worthwhile to disclose which
-_parts_ you use AI for — there's a meaningful distinction between "this
-whole thing is vibecoded" and "I wrote this backup tool and used an LLM
-to style the web frontend". For example, we've used LLMs to help write
-some of these lecture notes, including proofreading, brainstorming, and
-generating first drafts of code snippets and exercises.
+అంటే, ఆ conversation స్వయంగా ఆ మార్పుకు సంబంధించిన విలువైన context source గా పనిచేస్తుంది.
 
-You'll also want to follow the norms of the teams and projects you're
-contributing to here. Some teams have stricter policies around the use
-of AI than others (e.g., for compliance or data residency reasons), and
-you don't want to accidentally run afoul of that. Being open about your
-use helps prevent potentially costly mistakes.
+లేదా, అదనంగా, ఒక ఉపయోగకరమైన పద్ధతి ఏమిటంటే:
 
-> If you're aiming to learn as part of the work you're doing, keep in
-> mind that if you have AI do all or most of the work for you can be
-> self-defeating; you're likely to learn more about prompting (and maybe
-> reviewing AI output) than the task itself. Especially when you're
-> learning, the point may be the journey, not the destination, so using
-> AI to "get the solution quickly" is an anti-goal.
+LLM కు commit message ను *why* పై దృష్టి పెట్టి రాయమని స్పష్టంగా చెప్పడం. అలాగే, అవసరమైన context లోపిస్తే మిమ్మల్ని ప్రశ్నించి (query) తెలుసుకోవాలని సూచించడం.
 
-A related concern comes up in interviews and other assessment
-situations. These are often intended to specifically evaluate _your_
-skills and abilities, not those of an LLM. More companies now allow you
-to use LLMs and other AI-assisted tooling in interviews as long as you
-let them observe those interactions as part of the interview (i.e., they
-are evaluating your skill in making use of those tools too!), but those
-are still in the minority. If you are unsure about whether AI assistance
-is in scope for a particular task, ask!
+అసలు చూస్తే, ఆ సందర్భంలో మీరు coding agent ఉపయోగించగల MCP "tool" లాగా వ్యవహరిస్తున్నారు. Agent మీతో ప్రశ్నలు అడిగి, అవసరమైన context ను "చదువుకుంటుంది".
 
-> It should go without saying that if an assessment situation explicitly
-> calls for no external tools, no LLMs, etc., you should not use them.
-> Trying to do so discretely without getting caught **will** come back
-> to bite you.
+మీ మార్పులు (changes) మరింత క్లిష్టంగా మారుతున్న కొద్దీ, commits ను కూడా తార్కికంగా (logically) విభజించడం అలవాటు చేసుకోండి (`git add -p` మీకు మంచి మిత్రుడు).
 
-# Exercises
+ప్రతి commit:
 
-1. Browse the source code of a well-known project (e.g.,
-   [Redis](https://github.com/redis/redis) or
-   [curl](https://github.com/curl/curl)). Find examples of some of the
-   comment types mentioned in the lecture: a useful TODO, a reference to
-   external documentation, a "why not" comment explaining an avoided
-   approach, or a hard-learned lesson. What would be lost if that
-   comment was not there?
+- ఒకే అర్థవంతమైన (coherent) మార్పును సూచించాలి
+- స్వతంత్రంగా అర్థం చేసుకునేలా ఉండాలి
+- స్వతంత్రంగా review చేయగలిగేలా ఉండాలి
 
-1. Pick an open-source project you're interested in and look at its
-   recent commit history (`git log`). Find one commit with a good
-   message that explains *why* the change was made, and one with a weak
-   message that only describes *what* changed. For the weak one, look at
-   the diff (`git show <hash>`) and try to write a better commit message
-   following the Problem → Solution → Implications structure. Notice how
-   much work is required to reassemble the necessary context after the
-   fact!
+Refactoring ను కొత్త features తో కలపవద్దు. అలాగే, సంబంధం లేని bug fixes ను ఒకే commit లో చేర్చవద్దు.
 
-1. Compare the READMEs of three GitHub projects with 1000+ stars. Are
-   all of them equally useful? Look for things that come across mostly
-   as noise to you as a lesson for future READMEs you write yourself.
+అలా చేయడం వల్ల:
 
-1. Find an open issue on a project you use (check the "good first issue"
-   or "help wanted" labels if they have it). Evaluate the issue against
-   the criteria from the lecture: does it seem like it values the
-   maintainer's time and contains all the information necessary to debug
-   it, or do you expect that the maintainer may need to go multiple
-   rounds of questions with the submitter to get to the root problem?
+- ఏ మార్పు ఏ సమస్యను పరిష్కరించిందో అర్థం చేసుకోవడం కష్టమవుతుంది
+- codebase చరిత్ర (history) గందరగోళంగా మారుతుంది
+- review ప్రక్రియ అనవసరంగా నెమ్మదిస్తుంది
 
-1. Think of a bug you've encountered in software you use (or find one in
-   an issue tracker). Practice creating a minimal reproducible example:
-   strip away everything unrelated to the bug until you have the
-   smallest case that still demonstrates the problem. Write up what you
-   removed and why.
+అదనంగా, మంచి commit నిర్మాణం `git bisect` వంటి tools ను మరింత శక్తివంతంగా ఉపయోగించుకునే అవకాశం ఇస్తుంది. అయితే అది ఇంకో సందర్భంలో చర్చించాల్సిన విషయం.
 
-1. Find a merged pull request on a project you're familiar with that has
-   substantive review comments (not just "LGTM"). Read through the
-   review. Were all the comments equally productive? If you were the PR
-   author, how would you find the experience of getting all those
-   comments?
+> Technical writing ను మరింత శ్రద్ధగా చేయడం ప్రారంభించినప్పుడు ఒక విషయం గుర్తుంచుకోండి: చదివే వ్యక్తిని గౌరవించండి.
+>
+> Writing మొదలుపెట్టిన తర్వాత, అవసరానికి మించి వివరించే (over-explaining) అలవాటు రావడం చాలా సులభం. కానీ ఆ ప్రలోభాన్ని నిరోధించాలి. లేకపోతే, చదివేవారు మీరు రాసిన దాంట్లో ఏదీ చదవకపోవచ్చు.
+>
+> *Why* ను వివరించండి. కానీ *How* ను వారి పరిస్థితికి అనుగుణంగా వారు స్వయంగా అర్థం చేసుకుంటారనే నమ్మకం ఉంచండి.
+>
+> సంక్షిప్తంగా చెప్పాలంటే: అవసరమైన context ఇవ్వండి, కానీ పాఠకుడి ఆలోచనా సామర్థ్యాన్ని భర్తీ చేయడానికి ప్రయత్నించవద్దు.
 
-1. Go to Stack Overflow and find a question in a technology you know
-   that has a highly-voted answer. Then find one that was closed or
-   heavily downvoted. Compare them against the advice from the lecture;
-   was it predictable which question would get better answers?
+# సహకారం (Collaboration)
+
+Engineers గా, మన పని సమయంలో ఎక్కువ భాగం మన కంప్యూటర్ ముందు కూర్చొని code రాయడంలో గడవొచ్చు. అయితే, మన సమయంలోని గణనీయమైన భాగం ఇతరులతో కమ్యూనికేట్ చేయడంలో కూడా వెచ్చించబడుతుంది.
+
+ఆ సమయం సాధారణంగా రెండు భాగాలుగా విభజించబడుతుంది:
+
+- సహకారం (Collaboration)
+- నేర్చుకోవడం మరియు నేర్పించడం (Education)
+
+ఈ రెండింటిలోనూ మెరుగుపడటానికి పెట్టుబడి పెట్టడం వల్ల గణనీయమైన ప్రయోజనం (payoff) లభిస్తుంది.
+
+## సహకారం అందించడం (Contributing)
+
+మీరు:
+
+- ఒక bug report సమర్పిస్తున్నా,
+- చిన్న bug fix అందిస్తున్నా,
+- లేదా పెద్ద feature ను implement చేస్తున్నా,
+
+ఒక విషయం గుర్తుంచుకోవడం ముఖ్యం.
+
+సాధారణంగా:
+
+- Contributors కంటే users సంఖ్య అనేక రెట్లు ఎక్కువగా ఉంటుంది.
+- Maintainers కంటే contributors సంఖ్య కూడా అనేక రెట్లు ఎక్కువగా ఉంటుంది.
+
+దీని ఫలితంగా, maintainers సమయం ఎప్పుడూ అధిక ఒత్తిడిలో (highly oversubscribed) ఉంటుంది.
+
+మీ contribution ఉపయోగకరమైన దిశగా వెళ్లే అవకాశాన్ని పెంచాలనుకుంటే, మీ contribution:
+
+- అధిక signal-to-noise ratio కలిగి ఉండాలి
+- maintainer సమయానికి తగిన విలువను అందించాలి
+
+అంటే, వారి సమయాన్ని వృథా చేయకుండా, సమస్యను అర్థం చేసుకోవడానికి మరియు పరిష్కరించడానికి అవసరమైన సమాచారాన్ని స్పష్టంగా అందించాలి.
+
+ఉదాహరణకు, ఒక మంచి bug report maintainer సమయాన్ని గౌరవిస్తుంది. ఎందుకంటే అది సమస్యను అర్థం చేసుకోవడానికి మరియు మళ్లీ reproduce చేయడానికి అవసరమైన అన్ని వివరాలను అందిస్తుంది:
+
+- **Environment**: OS, version numbers, మరియు సమస్యకు సంబంధించిన configuration వివరాలను ఇవ్వండి.
+
+- **మీరు ఆశించిన ఫలితం** vs **వాస్తవంగా జరిగినది**: మీరు ఏమి జరుగుతుందని అనుకున్నారు, కానీ నిజంగా ఏమి జరిగిందో స్పష్టంగా వివరించండి.
+
+- **Steps to Reproduce**: సాధ్యమైనంత నిర్దిష్టంగా (specific) ఉండండి.
+  
+  `"Button పై click చేయండి"` అనేది అంతగా ఉపయోగపడదు.
+
+  `"Admin గా login అయిన తర్వాత `/settings` page లోని Submit button పై click చేయండి"` అనేది చాలా ఉపయోగకరమైన సూచన.
+
+- **మీరు ఇప్పటికే ప్రయత్నించినవి**: సమస్యను పరిష్కరించడానికి మీరు ఇప్పటికే ఏమేమి ప్రయత్నించారో చెప్పండి. ఇది ఒకే సూచనలను మళ్లీ మళ్లీ ఇవ్వకుండా నిరోధిస్తుంది. అలాగే, మీరు కొంత పరిశీలన (investigation) చేశారని కూడా చూపిస్తుంది.
+
+> మీరు ఏదైనా security vulnerability ను గుర్తిస్తే, దాన్ని బహిరంగంగా (publicly) పోస్ట్ చేయవద్దు.
+>
+> ముందుగా maintainers ను వ్యక్తిగతంగా (privately) సంప్రదించండి. సమస్యను సరిచేయడానికి వారికి తగిన సమయం ఇవ్వండి. ఆ తర్వాత మాత్రమే దాని గురించి బహిరంగంగా వెల్లడించండి (disclosure).
+>
+> ఈ ప్రయోజనం కోసం చాలా projects లో `SECURITY.md` లేదా దానికి సమానమైన ఫైల్ ఉంటుంది.
+
+**ఇప్పటికే ఉన్న issues కోసం తప్పనిసరిగా search చేయండి.**
+
+మీ bug report లేదా feature request ఇప్పటికే ఎవరో report చేసి ఉండవచ్చు.
+
+అలాంటి సందర్భంలో:
+
+- కొత్త issue సృష్టించడం కంటే
+- ఇప్పటికే ఉన్న discussion కు అదనపు సమాచారం జోడించడం
+
+చాలా మంచిది.
+
+దీంతో maintainers కు అనవసరమైన noise కూడా తగ్గుతుంది.
+
+**Minimal Reproducible Examples** (MREs) అందించగలిగితే అవి బంగారం లాంటివి.
+
+ఒక చిన్న, స్వతంత్ర ఉదాహరణ ద్వారా సమస్యను నమ్మదగిన విధంగా (reliably) reproduce చేయగలిగితే:
+
+- maintainer యొక్క చాలా సమయం మరియు శ్రమ ఆదా అవుతుంది
+- bug ను reproduce చేయడం అనే అత్యంత కష్టమైన దశ సులభమవుతుంది
+
+అదే కాకుండా, సమస్యను isolate చేయడానికి మీరు చేసే ప్రయత్నం:
+
+- సమస్యను మరింత లోతుగా అర్థం చేసుకోవడంలో సహాయపడుతుంది
+- కొన్నిసార్లు మీరు స్వయంగా పరిష్కారాన్ని కనుగొనే స్థాయికి కూడా తీసుకెళ్తుంది
+
+Maintainers నుంచి వెంటనే స్పందన రాకపోతే, వారు చాలా సందర్భాల్లో పరిమిత సమయం కలిగిన volunteers అని గుర్తుంచుకోండి.
+
+వారి సమాధానం కోసం ఎదురుచూస్తున్నట్లయితే:
+
+- రెండు వారాల తర్వాత మర్యాదపూర్వకమైన (polite) follow-up పంపడం సమంజసం.
+- ప్రతిరోజూ reminders లేదా pings పంపడం మాత్రం సరైంది కాదు.
+
+అలాగే:
+
+- `"నాకూ ఇదే సమస్య వచ్చింది"` (me too) వంటి వ్యాఖ్యలు
+- లేదా terminal output ను కేవలం copy-paste చేసి పెట్టిన bug reports
+
+సాధారణంగా మీ issue కు traction రావడంలో సహాయపడవు. చాలా సందర్భాల్లో అవి ప్రతికూల ప్రభావమే చూపుతాయి.
+
+మీరు code contribution చేయాలని అనుకుంటే, ముందుగా project యొక్క contribution guidelines ను తెలుసుకోవాలి.
+
+చాలా projects లో `CONTRIBUTING.md` అనే ఫైల్ ఉంటుంది — దానిని అనుసరించండి.
+
+సాధారణంగా, చిన్న మార్పులతో ప్రారంభించడం ఉత్తమం.
+
+ఉదాహరణకు:
+
+- Typo fix
+- Documentation మెరుగుదల
+
+వంటి చిన్న contributions మొదటికి చాలా మంచివి.
+
+ఎందుకంటే, ఇవి project లోని processes ను నేర్చుకునేందుకు సహాయపడతాయి. అదే సమయంలో, content గురించి ఎక్కువ చర్చలు (back and forth) చేయాల్సిన అవసరం ఉండదు.
+
+> Project ఏ license ను ఉపయోగిస్తుందో తప్పనిసరిగా పరిశీలించండి. మీరు అందించే code కూడా అదే license పరిధిలోకి వస్తుంది.
+>
+> ముఖ్యంగా, GPL వంటి **copyleft licenses** విషయంలో జాగ్రత్తగా ఉండండి.
+>
+> ఇటువంటి licenses ప్రకారం, ఆ code ఆధారంగా తయారయ్యే derivatives కూడా Open Source గా ఉండాలి.
+>
+> మీరు అలాంటి project పై పని చేస్తే, అది మీ employer పై కూడా కొన్ని ప్రభావాలు చూపవచ్చు.
+>
+> మరిన్ని వివరాల కోసం:
+>
+> https://choosealicense.com/
+>
+> అనే website ఉపయోగకరమైన సమాచారాన్ని అందిస్తుంది.
+
+మీరు Pull Request (PR) తెరవాలని నిర్ణయించుకున్న తర్వాత, ముందుగా మీరు ఆమోదించబడాలని కోరుకునే మార్పును (change) స్పష్టంగా వేరు చేసి ఉంచారని నిర్ధారించుకోండి.
+
+మీ PR లో అదే సమయంలో అనేక సంబంధం లేని (unrelated) మార్పులు ఉంటే, reviewer దానిని తిరిగి పంపించి ముందుగా cleanup చేయమని చెప్పే అవకాశం చాలా ఎక్కువ.
+
+ఇది, git commits ను అర్థవంతమైన (semantically related) భాగాలుగా విభజించాల్సిన విధానంతో సమానమైన విషయం.
+
+కొన్ని సందర్భాల్లో, బయటికి చూస్తే సంబంధం లేని అనేక మార్పులు కనిపించినా, అవన్నీ ఒకే feature ను అమలు చేయడానికి అవసరమై ఉండవచ్చు.
+
+అలాంటి సందర్భంలో, ఆ feature కు అవసరమైన అన్ని మార్పులను కలిగి ఉన్న పెద్ద PR ను తెరవడం సమంజసమే.
+
+అయితే, అటువంటి సందర్భాల్లో **commit hygiene** ప్రత్యేకంగా ముఖ్యమవుతుంది.
+
+ఎందుకంటే maintainers కు:
+
+- మొత్తం PR ను ఒకేసారి review చేసే అవకాశం
+- లేదా commit-by-commit review చేసే అవకాశం
+
+ఉండాలి.
+
+తర్వాత, ఆ మార్పు వెనుక ఉన్న *why* ను స్పష్టంగా వివరించండి.
+
+కేవలం *what changed* అనే విషయాన్ని మాత్రమే చెప్పకండి.
+
+వివరించాల్సినవి:
+
+- ఈ మార్పు ఎందుకు అవసరమైంది?
+- ఈ సమస్యను పరిష్కరించడానికి ఇదే సరైన విధానం ఎందుకు?
+- Review సమయంలో ప్రత్యేక శ్రద్ధ అవసరమైన భాగాలు ఏమైనా ఉన్నాయా?
+
+అలాంటి అంశాలను ముందుగానే (proactively) ప్రస్తావించండి.
+
+`CONTRIBUTING.md` లోని సూచనలు మరియు మీ మార్పు స్వభావాన్ని బట్టి, reviewers అదనపు సమాచారాన్ని కూడా ఆశించవచ్చు.
+
+ఉదాహరణకు:
+
+- మీరు తీసుకున్న trade-offs
+- మార్పును ఎలా test చేయాలి
+- పరిమితులు లేదా తెలిసిన ప్రభావాలు
+
+వంటి వివరాలు.
+
+> సాధ్యమైనంత వరకు, project ను fork చేయడం కంటే అసలు (upstream) project కే contribution ఇవ్వాలని మేము సిఫారసు చేస్తున్నాము.
+>
+> Forking (license అనుమతిస్తే) అనేది, మీరు చేయాలనుకుంటున్న మార్పులు అసలు project పరిధికి (scope) బయట ఉన్నప్పుడు మాత్రమే పరిగణించాల్సిన ఎంపిక.
+>
+> మీరు fork చేసినా, అసలు project కు తగిన గుర్తింపు (acknowledgement) ఇవ్వడం మర్చిపోవద్దు.
+
+AI సహాయంతో నమ్మదగినట్లుగా (plausible-looking) కనిపించే code మరియు PRలను చాలా వేగంగా తయారు చేయవచ్చు. అయితే, మీరు ఏమి contribute చేస్తున్నారో అర్థం చేసుకోవాల్సిన బాధ్యత నుంచి అది మిమ్మల్ని విముక్తి చేయదు.
+
+మీరు స్వయంగా వివరించలేని (explain చేయలేని) AI-generated code ను submit చేయడం వల్ల, maintainers పై అనవసరమైన భారం పడుతుంది.
+
+ఎందుకంటే వారు:
+
+- ఆ code ను review చేయాలి
+- భవిష్యత్తులో maintain చేయాల్సి రావచ్చు
+
+అయితే, ఆ code ను రాసిన వ్యక్తికే అది పూర్తిగా అర్థం కాకపోవచ్చు.
+
+సమస్యలను గుర్తించడానికి, fixes లేదా features రూపొందించడానికి AI ను ఉపయోగించడం పూర్తిగా సమంజసమే.
+
+కానీ ఒక ముఖ్యమైన షరతు ఉంది:
+
+**మీరు అవసరమైన due diligence ను తప్పనిసరిగా చేయాలి.**
+
+అంటే:
+
+- Code ను అర్థం చేసుకోవాలి
+- దాన్ని మెరుగుపరచాలి
+- పరీక్షించాలి (test)
+- ఉపయోగకరమైన contribution గా మార్చాలి
+
+ఈ బాధ్యతను ఇప్పటికే పనిలో మునిగిపోయిన maintainers పైకి నెట్టేయకూడదు.
+
+Maintainers దృష్టిలో చూస్తే, ఒక PR ను accept చేయడం అంటే కేవలం code ను merge చేయడం మాత్రమే కాదు.
+
+అది దీర్ఘకాలిక బాధ్యతను (long-term responsibility) స్వీకరించడం కూడా.
+
+Contributor ముందుకు వెళ్లిపోయిన చాలా కాలం తర్వాత కూడా, maintainers ఆ code ను నిర్వహించాల్సి ఉంటుంది.
+
+అందువల్ల, వారు ఈ పరిస్థితుల్లో PR ను తిరస్కరించవచ్చు:
+
+- మార్పు మంచి ఉద్దేశంతో చేసినదైనా, project దిశకు (direction) సరిపోకపోతే
+- వారు నిర్వహించకూడదనుకునే అదనపు క్లిష్టత (complexity) ను తీసుకువస్తే
+- ఆ మార్పు అవసరం ఎందుకు ఉందో సరిపడా documentation లేకపోతే
+
+అందువల్ల, ఆ contribution ను అంగీకరించడం maintenance burden కు తగిన విలువను ఇస్తుందని నిరూపించే బాధ్యత contributor అయిన మీపై ఉంటుంది.
+
+> PR పై feedback వచ్చినప్పుడు, ఒక విషయం గుర్తుంచుకోండి:
+>
+> **మీ code మీరు కాదు.**
+>
+> Reviewers మీ వ్యక్తిత్వాన్ని విమర్శించడం లేదు. వారు code ను మరింత మెరుగుపరచడానికి ప్రయత్నిస్తున్నారు.
+>
+> మీరు ఏదైనా feedback తో ఏకీభవించకపోతే, స్పష్టీకరణ కోసం ప్రశ్నలు అడగండి.
+>
+> అలా చేస్తే:
+>
+> - మీరు కొత్తగా ఏదైనా నేర్చుకోవచ్చు
+> - లేదా reviewer మీ దృక్కోణాన్ని అర్థం చేసుకుని కొత్త విషయం నేర్చుకోవచ్చు
+>
+> మంచి code review అనేది వాదనలో గెలవడం గురించి కాదు; కలిసి మెరుగైన software ను నిర్మించడం గురించి.
+
+## Code Review
+
+Code Review అనేది Senior Developers మాత్రమే చేసే పని అని మీరు అనుకోవచ్చు. కానీ వాస్తవానికి, మీరు ఊహించిన దానికంటే చాలా ముందుగానే ఇతరుల code ను review చేయమని మిమ్మల్ని అడిగే అవకాశం ఉంటుంది.
+
+అలాగే, మీ దృక్కోణం (perspective) కూడా విలువైనదే.
+
+కొత్త చూపు (fresh eyes) కలిగిన వ్యక్తులు, అనుభవజ్ఞులైన developers కూడా గుర్తించకుండా వదిలేసే అంశాలను గుర్తించగలరు.
+
+అదేవిధంగా, code గురించి తక్కువ పరిచయం ఉన్న వ్యక్తులు అడిగే ప్రశ్నలు, documentation లో నమోదు చేయాల్సిన లేదా సులభతరం చేయాల్సిన ఊహాగానాలను (assumptions) బయటపెడతాయి.
+
+Code Review అనేది నేర్చుకోవడానికి అత్యంత వేగవంతమైన మార్గాలలో ఒకటి.
+
+ద్వారా మీరు:
+
+- ఇతరులు సమస్యలను ఎలా పరిష్కరిస్తారో చూడగలరు
+- ఉపయోగకరమైన patterns మరియు idioms నేర్చుకోగలరు
+- చదవడానికి సులభమైన code ఎలా ఉండాలో అర్థం చేసుకునే intuition ను అభివృద్ధి చేసుకోగలరు
+
+వ్యక్తిగత అభివృద్ధి (personal growth) తో పాటు, reviews:
+
+- bugs ను production కు చేరకముందే గుర్తిస్తాయి
+- జట్టులో (team) జ్ఞానాన్ని పంచుతాయి
+- సహకారం ద్వారా code quality ను మెరుగుపరుస్తాయి
+
+అందువల్ల, Code Review అనేది కేవలం bureaucratic process కాదు.
+
+మంచి Code Review చేయడం ఒక నైపుణ్యం (skill). అది కాలక్రమేణా అభివృద్ధి చెందుతుంది.
+
+అయితే, వెంటనే ఉపయోగపడే కొన్ని సూచనలు ఉన్నాయి:
+
+- **వ్యక్తిని కాదు, code ను review చేయండి**
+
+  `"ఈ function కొంచెం గందరగోళంగా ఉంది"` అనేది,
+
+  `"నువ్వు గందరగోళమైన code రాశావు"` అనే వ్యాఖ్య కంటే చాలా మెరుగైనది.
+
+- **Actionable comments ఇవ్వండి**
+
+  `"ఈ globals ను config dataclass తో replace చేయగలరా?"`
+
+  అనే వ్యాఖ్య,
+
+  `"ఇక్కడ globals వాడొద్దు"`
+
+  అనే వ్యాఖ్య కంటే పరిష్కరించడం సులభం.
+
+- **ఆదేశాలు ఇవ్వడం కంటే ప్రశ్నలు అడగండి**
+
+  `"ఇక్కడ X null అయితే ఏమవుతుంది?"`
+
+  అనే ప్రశ్న చర్చకు అవకాశం ఇస్తుంది.
+
+  `"Null case ను handle చేయండి"`
+
+  అనే వ్యాఖ్య కంటే ఇది మెరుగైనది.
+
+- **"Why" ను వివరించండి**
+
+  `"ఇక్కడ constant ఉపయోగించండి"`
+
+  అనడం కంటే,
+
+  `"ఇక్కడ constant ఉపయోగిస్తే environment ఆధారంగా timeout ను సులభంగా మార్చవచ్చు"`
+
+  అనడం మరింత ఉపయోగకరంగా ఉంటుంది.
+
+- **Blocking issues మరియు suggestions మధ్య తేడా స్పష్టంగా చెప్పండి**
+
+  తప్పనిసరిగా మార్చాల్సిన అంశాలు ఏవి?
+
+  వ్యక్తిగత అభిరుచికి (preference) సంబంధించిన సూచనలు ఏవి?
+
+  అన్నది స్పష్టంగా తెలియజేయండి.
+
+- **మంచి విషయాలను కూడా గుర్తించండి**
+
+  తెలివైన solutions లేదా శుభ్రమైన implementations ను ప్రశంసించడం:
+
+  - రచయితకు ప్రోత్సాహం ఇస్తుంది
+  - భవిష్యత్తులో ఏమి కొనసాగించాలో అర్థం చేసుకునేలా చేస్తుంది
+
+- **ఎప్పుడు ఆగాలో తెలుసుకోండి**
+
+  Contributors వద్ద సమయం మరియు సహనం రెండూ పరిమితంగానే ఉంటాయి.
+
+  ప్రతి చిన్న nitpick ను సరిచేయించడంలోనే సమయం వెచ్చించడం ఎప్పుడూ సరైనది కాదు.
+
+  పెద్ద మరియు ముఖ్యమైన అంశాలపై దృష్టి పెట్టండి.
+
+  చిన్న nitpicks ను అవసరమైతే తర్వాత మీరే సరిచేయడాన్ని కూడా పరిగణించండి.
+
+> AI tools కొన్ని రకాల సమస్యలను గుర్తించగలవు. కానీ అవి Human Review కు ప్రత్యామ్నాయం కావు.
+>
+> అవి:
+>
+> - పూర్తి context ను అర్థం చేసుకోలేవు
+> - Product requirements ను తెలుసుకోలేవు
+> - కొన్నిసార్లు తప్పు సూచనలను కూడా పూర్తి నమ్మకంతో ఇవ్వగలవు
+>
+> కాబట్టి, వాటిని మొదటి దశ (first pass) review కోసం ఉపయోగించడం మంచిదే.
+>
+> కానీ, ఆలోచనాత్మకమైన (thoughtful) మానవ సమీక్షకు అవి ప్రత్యామ్నాయం కావు.
+# నేర్చుకోవడం మరియు నేర్పించడం (Education)
+
+Engineers గా, code రాయడంలో కాకుండా గడిపే సమయం లో పెద్ద భాగం ప్రశ్నలు అడగడం, ప్రశ్నలకు సమాధానాలు ఇవ్వడం, లేదా ఈ రెండింటి మిశ్రమంలోనే గడుస్తుంది.
+
+ఇది సాధారణంగా:
+
+- సహకారం (collaboration) సమయంలో
+- సహచరులతో (peers) చర్చల్లో
+- కొత్త విషయాలు నేర్చుకునే ప్రయత్నంలో
+
+జరుగుతూ ఉంటుంది.
+
+మంచి ప్రశ్నలు అడగడం ఒక ముఖ్యమైన నైపుణ్యం.
+
+ఈ నైపుణ్యం, అద్భుతంగా వివరించే వ్యక్తుల నుంచే కాకుండా, ఎవరినుంచైనా సమర్థవంతంగా నేర్చుకోవడంలో మీకు సహాయపడుతుంది.
+
+Julia Evans రాసిన ఈ blog posts చదవదగ్గవి:
+
+- "How to ask good questions"
+- "How to get useful answers to your questions"
+
+వాటిలోని కొన్ని ముఖ్యమైన సూచనలు:
+
+- **ముందుగా మీ అవగాహనను వివరించండి**
+
+  మీకు తెలిసిందని మీరు అనుకుంటున్న విషయాన్ని ముందుగా చెప్పి,
+
+  `"నా అర్థం సరైనదేనా?"`
+
+  అని అడగండి.
+
+  దీనివల్ల సమాధానం ఇచ్చే వ్యక్తికి, మీకు నిజంగా ఏ అంశాల్లో అవగాహన లోపిస్తోందో గుర్తించడం సులభమవుతుంది.
+
+- **Yes/No ప్రశ్నలు అడగండి**
+
+  `"X నిజమేనా?"`
+
+  వంటి ప్రశ్నలు, సంబంధం లేని వివరణల (tangential explanations) వైపు చర్చ మళ్లకుండా నిరోధిస్తాయి.
+
+  అలాగే, చాలా సందర్భాల్లో అవే ఉపయోగకరమైన అదనపు వివరణలకు దారితీస్తాయి.
+
+- **నిర్దిష్టంగా (specific) ఉండండి**
+
+  `"SQL joins ఎలా పనిచేస్తాయి?"`
+
+  అనేది చాలా విస్తృతమైన ప్రశ్న.
+
+  కానీ,
+
+  `"RIGHT table లో matching row లేకపోయినా LEFT JOIN ఆ row ను include చేస్తుందా?"`
+
+  అనేది స్పష్టంగా సమాధానం ఇవ్వగలిగే ప్రశ్న.
+
+- **అర్థం కాకపోతే అంగీకరించండి**
+
+  మీకు తెలియని పదం లేదా concept వినిపిస్తే, మధ్యలో ఆపి అడగడానికి సంకోచించవద్దు.
+
+  అది బలహీనత కాదు; ఆత్మవిశ్వాసానికి సూచిక.
+
+  అదే విధంగా, మీకు సమాధానం తెలియని ప్రశ్న ఎవరైనా అడిగితే:
+
+  `"నాకు తెలియదు"`
+
+  అని చెప్పడం ఉత్తమం.
+
+  అవసరమైతే:
+
+  `"కానీ నా అభిప్రాయం ప్రకారం..."`
+
+  లేదా
+
+  `"కానీ నేను తెలుసుకొని చెబుతాను"`
+
+  అని కూడా చెప్పవచ్చు.
+
+- **అసంపూర్ణ సమాధానాలను అంగీకరించవద్దు**
+
+  నిజంగా అర్థమయ్యే వరకు follow-up ప్రశ్నలు అడుగుతూ ఉండండి.
+
+- **ముందుగా కొంత పరిశోధన చేయండి**
+
+  ప్రాథమిక పరిశీలన (basic investigation) చేయడం వల్ల మీరు మరింత లక్ష్యబద్ధమైన (targeted) ప్రశ్నలు అడగగలుగుతారు.
+
+  అయితే, సహచరుల మధ్య జరిగే సాధారణ చర్చల్లో (casual discussions) ఇది తప్పనిసరి కాదు.
+
+గుర్తుంచుకోండి:
+
+బాగా ఆలోచించి అడిగిన ప్రశ్నలు కేవలం మీకే కాదు, మొత్తం community కి ఉపయోగపడతాయి.
+
+ఎందుకంటే అవి, ఇతరులు కూడా అర్థం చేసుకోవాల్సిన దాగి ఉన్న assumptions ను వెలికితీస్తాయి.
+
+> ఈ సూచనలు మనుషులతో కమ్యూనికేట్ చేస్తున్నప్పుడు మాత్రమే కాదు, LLMs తో సంభాషిస్తున్నప్పుడు కూడా అంతే వర్తిస్తాయి!
+
+# AI వినియోగ మర్యాదలు (AI Etiquette)
+
+Software Engineering లో LLMs మరియు AI వినియోగం వేగంగా పెరుగుతున్న కొద్దీ, వాటి వినియోగానికి సంబంధించిన సామాజిక (social) మరియు వృత్తిపరమైన (professional) ప్రమాణాలు ఇంకా రూపుదిద్దుకుంటున్నాయి.
+
+[Agentic Coding](/2026/agentic-coding/) lecture లో AI వినియోగానికి సంబంధించిన అనేక ప్రాయోగిక (tactical) అంశాలను ఇప్పటికే చర్చించాము. అయితే, వాటి వినియోగానికి సంబంధించిన కొన్ని "soft skills" మరియు ప్రవర్తనా అంశాలు కూడా చర్చించదగినవే.
+
+మొదటిది:
+
+AI మీ పనికి గణనీయమైన సహకారం అందించినట్లయితే, **దాన్ని వెల్లడించండి (disclose చేయండి).**
+
+ఇది సిగ్గుపడాల్సిన విషయం కాదు.
+
+ఇది:
+
+- నిజాయితీ (honesty) గురించి
+- సరైన అంచనాలు (expectations) ఏర్పరచడం గురించి
+- ఆ పనికి తగిన స్థాయి review లభించేలా చూడడం గురించి
+
+అలాగే, AI ను మీరు **ఏ భాగాల కోసం ఉపయోగించారో** కూడా చెప్పడం మంచిది.
+
+ఎందుకంటే:
+
+> "ఈ మొత్తం project vibecoded"
+
+అనేది ఒక విషయం.
+
+> "Backend నేను రాశాను, కానీ web frontend styling కోసం LLM ఉపయోగించాను"
+
+అనేది పూర్తిగా వేరే విషయం.
+
+ఉదాహరణకు, ఈ lecture notes తయారీలో కూడా మేము LLMs ను ఉపయోగించాము.
+
+అవి సహాయపడిన అంశాలు:
+
+- Proofreading
+- Brainstorming
+- Code snippets కు మొదటి drafts తయారు చేయడం
+- Exercises కోసం ప్రారంభ drafts రూపొందించడం
+
+ఈ విషయంలో, మీరు సహకరిస్తున్న teams మరియు projects లో ఉన్న ప్రమాణాలను (norms) కూడా గౌరవించాలి.
+
+కొన్ని teams, ఇతర teams కంటే AI వినియోగంపై కఠినమైన విధానాలు (policies) కలిగి ఉంటాయి.
+
+ఉదాహరణకు:
+
+- Compliance కారణాలు
+- Data Residency కారణాలు
+- Security కారణాలు
+
+మీకు తెలియకుండానే ఆ నియమాలను ఉల్లంఘించడం (run afoul of them) ఖరీదైన తప్పిదాలకు దారితీయవచ్చు.
+
+AI వినియోగం గురించి బహిరంగంగా (openly) మాట్లాడటం ద్వారా అలాంటి సమస్యలను నివారించవచ్చు.
+
+> మీరు చేస్తున్న పని ద్వారా నేర్చుకోవడం కూడా మీ లక్ష్యాలలో ఒకటైతే, ఒక విషయం గుర్తుంచుకోండి.
+>
+> AI మీ కోసం మొత్తం పని లేదా ఎక్కువ భాగం పని చేస్తే, అది కొన్నిసార్లు మీ లక్ష్యానికే విరుద్ధంగా మారవచ్చు.
+>
+> ఎందుకంటే, అప్పుడు మీరు:
+>
+> - Prompting గురించి
+> - AI output ను review చేయడం గురించి
+>
+> ఎక్కువ నేర్చుకునే అవకాశం ఉంది.
+>
+> కానీ అసలు task గురించి అంతగా నేర్చుకోకపోవచ్చు.
+>
+> ముఖ్యంగా నేర్చుకునే దశలో, గమ్యం (destination) కంటే ప్రయాణం (journey) ముఖ్యమైనది.
+>
+> కాబట్టి, AI ద్వారా "త్వరగా solution పొందడం" ఎల్లప్పుడూ సరైన లక్ష్యం కాదు.
+
+దీనికి సంబంధించిన మరో ముఖ్యమైన అంశం interviews మరియు assessments లో కనిపిస్తుంది.
+
+ఇలాంటి సందర్భాల్లో, సాధారణంగా సంస్థలు అంచనా వేయాలనుకునేది:
+
+- **మీ నైపుణ్యాలను**
+- **మీ సామర్థ్యాలను**
+
+గానీ, LLM యొక్క సామర్థ్యాలను కాదు.
+
+ఇప్పుడిప్పుడే కొన్ని సంస్థలు interviews లో LLMs మరియు AI-assisted tools ఉపయోగించడానికి అనుమతిస్తున్నాయి.
+
+కానీ ఒక షరతుతో:
+
+వారు ఆ interactions ను కూడా పరిశీలించగలగాలి.
+
+అంటే:
+
+- మీరు AI ను ఎలా ఉపయోగిస్తున్నారు?
+- సరైన prompts ఎలా ఇస్తున్నారు?
+- వచ్చిన ఫలితాలను ఎలా విశ్లేషిస్తున్నారు?
+
+అనే విషయాలను కూడా వారు అంచనా వేస్తున్నారు.
+
+అయితే, ప్రస్తుతం అలాంటి సంస్థలు ఇంకా మైనారిటీలోనే ఉన్నాయి.
+
+ఏదైనా task లేదా assessment లో AI వినియోగం అనుమతించబడిందో లేదో మీకు స్పష్టంగా తెలియకపోతే, అడగండి.
+
+> ఇది ప్రత్యేకంగా చెప్పాల్సిన అవసరం లేకపోవచ్చు:
+>
+> ఏదైనా assessment లో:
+>
+> - External tools ఉపయోగించవద్దు
+> - LLMs ఉపయోగించవద్దు
+>
+> అని స్పష్టంగా పేర్కొంటే, వాటిని ఉపయోగించకూడదు.
+>
+> దాచిపెట్టి (secretly) ఉపయోగించి పట్టుబడకుండా తప్పించుకోవాలని ప్రయత్నించడం, చివరికి మీకే నష్టం కలిగిస్తుంది.
+>
+> అలాంటి చర్యలు దీర్ఘకాలంలో తప్పకుండా ప్రతికూల ప్రభావాన్ని చూపుతాయి.
+
+# అభ్యాసాలు (Exercises)
+
+1. ప్రసిద్ధ Open Source projects లో ఒకదాని source code ను పరిశీలించండి. ఉదాహరణకు:
+
+   - [Redis](https://github.com/redis/redis)
+   - [curl](https://github.com/curl/curl)
+
+   Lecture లో చర్చించిన comment రకాలలో కొన్ని ఉదాహరణలను కనుగొనండి:
+
+   - ఉపయోగకరమైన TODO
+   - External documentation కు reference
+   - ఒక approach ను ఎందుకు ఉపయోగించలేదో వివరించే "why not" comment
+   - Hard-learned lesson ను నమోదు చేసిన comment
+
+   ఆ comment లేకపోతే ఏ సమాచారం కోల్పోయేవారో ఆలోచించండి.
+
+2. మీకు ఆసక్తి ఉన్న ఒక Open Source project ను ఎంచుకుని, దాని recent commit history (`git log`) ను పరిశీలించండి.
+
+   కనుగొనండి:
+
+   - మార్పు *ఎందుకు* చేయబడిందో వివరించే ఒక మంచి commit message
+   - కేవలం *ఏమి* మారిందో మాత్రమే చెప్పే ఒక బలహీనమైన commit message
+
+   బలహీనమైన commit కోసం:
+
+   - Diff ను పరిశీలించండి (`git show <hash>`)
+   - **Problem → Solution → Implications** నిర్మాణాన్ని అనుసరించి ఒక మెరుగైన commit message రాయడానికి ప్రయత్నించండి
+
+   తర్వాత, అవసరమైన context ను మళ్లీ సేకరించడానికి ఎంత శ్రమ అవసరమైందో గమనించండి.
+
+3. GitHub లో 1000+ stars కలిగిన మూడు projects యొక్క READMEలను పోల్చండి.
+
+   ఆలోచించండి:
+
+   - అవన్నీ సమానంగా ఉపయోగకరంగా ఉన్నాయా?
+   - ఏ భాగాలు మీకు ఉపయోగకరంగా అనిపించాయి?
+   - ఏ భాగాలు ఎక్కువగా noise లాగా అనిపించాయి?
+
+   భవిష్యత్తులో మీరు README రాసేటప్పుడు ఉపయోగపడే పాఠాలను నమోదు చేయండి.
+
+4. మీరు ఉపయోగించే ఒక project లో open issue ను కనుగొనండి.
+
+   Project లో ఉంటే:
+
+   - `good first issue`
+   - `help wanted`
+
+   labels ను పరిశీలించండి.
+
+   ఆ issue ను lecture లోని ప్రమాణాల ఆధారంగా విశ్లేషించండి:
+
+   - అది maintainer సమయాన్ని గౌరవిస్తున్నట్లు కనిపిస్తుందా?
+   - Debug చేయడానికి అవసరమైన సమాచారం అంతా ఉందా?
+   - లేక maintainer సమస్య మూలాన్ని అర్థం చేసుకోవడానికి అనేక rounds ప్రశ్నలు అడగాల్సి వస్తుందని అనిపిస్తుందా?
+
+5. మీరు ఉపయోగించే software లో ఎదురైన bug గురించి ఆలోచించండి (లేదా issue tracker లో ఒక bug ను కనుగొనండి).
+
+   ఒక **Minimal Reproducible Example (MRE)** తయారు చేయడం అభ్యాసం చేయండి.
+
+   అంటే:
+
+   - Bug కు సంబంధం లేని అన్ని అంశాలను తొలగించండి
+   - సమస్య ఇంకా కనిపించే అత్యంత చిన్న ఉదాహరణను తయారు చేయండి
+
+   తర్వాత:
+
+   - ఏమి తొలగించారో
+   - ఎందుకు తొలగించారో
+
+   రాసి నమోదు చేయండి.
+
+6. మీకు పరిచయం ఉన్న ఒక project లో merge అయిన Pull Request ను కనుగొనండి.
+
+   షరతు:
+
+   - అందులో గణనీయమైన (substantive) review comments ఉండాలి
+   - కేవలం `"LGTM"` వంటి వ్యాఖ్యలు మాత్రమే ఉండకూడదు
+
+   Review మొత్తం చదవండి.
+
+   తర్వాత ఆలోచించండి:
+
+   - అన్ని comments సమానంగా ఉపయోగకరంగా ఉన్నాయా?
+   - కొన్ని comments ఇతర వాటికంటే ఎక్కువ విలువ ఇచ్చాయా?
+   - మీరు ఆ PR రచయిత అయితే, ఆ review అనుభవం మీకు ఎలా అనిపించేది?
+
+7. Stack Overflow కి వెళ్లి, మీకు తెలిసిన technology లో:
+
+   - అధిక upvotes పొందిన ఒక ప్రశ్నను
+   - close చేయబడిన లేదా ఎక్కువ downvotes పొందిన మరో ప్రశ్నను
+
+   కనుగొనండి.
+
+   Lecture లోని సూచనలతో పోల్చండి:
+
+   - మంచి ప్రశ్నలో ఏ లక్షణాలు ఉన్నాయి?
+   - బలహీనమైన ప్రశ్నలో ఏమి లోపించింది?
+   - ఏ ప్రశ్నకు మంచి సమాధానాలు వస్తాయో ముందుగానే ఊహించగలిగే పరిస్థితి ఉందా?
+
+   మీ పరిశీలనలను నమోదు చేయండి.

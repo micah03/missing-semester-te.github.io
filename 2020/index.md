@@ -14,7 +14,9 @@ phony: true
       <li>
         <strong>{{ lecture.date | date: '%-m/%-d' }}</strong>:
         {% if lecture.ready %}
-          <a href="{{ lecture.url }}">{{ lecture.title }}</a>
+          <a href="https://missing.csail.mit.edu{{ lecture.url }}">
+  {{ lecture.title }} (English)
+</a>
         {% elsif lecture.noclass %}
           {{ lecture.title }} [క్లాస్ లేదు]
         {% else %}

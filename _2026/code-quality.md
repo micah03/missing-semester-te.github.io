@@ -2,7 +2,7 @@
 layout: lecture
 title: "Code Quality"
 description: >
-  Learn about formatting, linting, testing, continuous integration, and more.
+  Formatting, Linting, Testing, Continuous Integration మరియు ఇతర ముఖ్యమైన Code Quality పద్ధతుల గురించి తెలుసుకోండి.
 thumbnail: /static/assets/thumbnails/2026/lec9.png
 date: 2026-01-23
 ready: true
@@ -11,124 +11,911 @@ video:
   id: XBiLUNx84CQ
 ---
 
-There are a variety of tools and techniques that support developers in writing high-quality code. In this lecture, we'll cover:
+అధిక నాణ్యత (high-quality) గల code రాయడంలో developers కు సహాయపడే అనేక tools మరియు techniques ఉన్నాయి.
+
+ఈ lecture లో మనం ఈ క్రింది అంశాలను చర్చిస్తాము:
 
 - [Formatting](#formatting)
 - [Linting](#linting)
 - [Testing](#testing)
-- [Pre-commit hooks](#pre-commit-hooks)
-- [Continuous integration](#continuous-integration)
-- [Command runners](#command-runners)
+- [Pre-commit Hooks](#pre-commit-hooks)
+- [Continuous Integration](#continuous-integration)
+- [Command Runners](#command-runners)
 
-As a bonus topic, we'll also cover [regular expressions](#regular-expressions), a cross-cutting topic that has applications in code quality (e.g., for running a subset of tests that match a pattern) as well as other domains like IDEs (e.g., for search and replace).
+అదనపు అంశంగా (bonus topic), మనం [Regular Expressions](#regular-expressions) గురించి కూడా చర్చిస్తాము.
 
-Many of these tools will be language-specific (e.g., the [Ruff](https://docs.astral.sh/ruff/) linter/formatter for Python). In some cases, tools will support multiple languages (e.g., the [Prettier](https://prettier.io/) code formatter). The concepts, however, are near universal --- you can find code formatters, linters, testing libraries, and so on for any programming language.
+ఇది అనేక రంగాల్లో ఉపయోగపడే (cross-cutting) విషయం.
+
+ఉదాహరణకు:
+
+- Code Quality లో, ఒక నిర్దిష్ట pattern కు సరిపడే tests ను మాత్రమే run చేయడానికి
+- IDEs లో, search and replace operations నిర్వహించడానికి
+
+Regular Expressions ఉపయోగపడతాయి.
+
+ఈ lecture లో చర్చించే tools లో చాలావరకు language-specific గా ఉంటాయి.
+
+ఉదాహరణకు:
+
+- Python కోసం [Ruff](https://docs.astral.sh/ruff/) linter/formatter
+
+కొన్ని tools మాత్రం బహుళ programming languages ను support చేస్తాయి.
+
+ఉదాహరణకు:
+
+- [Prettier](https://prettier.io/) code formatter
+
+అయితే, underlying concepts మాత్రం దాదాపు అన్ని programming languages లో ఒకే విధంగా ఉంటాయి.
+
+ఏ programming language అయినా, సాధారణంగా మీరు ఈ తరహా tools ను కనుగొనవచ్చు:
+
+- Code Formatters
+- Linters
+- Testing Libraries
+- Static Analysis Tools
+- మరియు ఇతర Code Quality tools
+
+అందువల్ల, ఇక్కడ నేర్చుకునే సూత్రాలు (concepts) ఒకే language కు పరిమితం కావు; అవి దాదాపు అన్ని software development ecosystems లో వర్తిస్తాయి.
 
 # Formatting
 
-Code auto-formatters automatically prettify surface syntax. This way, you can focus on the more deep and challenging problems, while the auto-formatting tool handles mundane details such as consistency of `'` versus `"` syntax for strings, having spaces surrounding binary operators (`x + y` instead of `x+y`), having `import` statements in sorted order, and avoiding over-length lines. One major benefit of code formatters is that they standardize code style across all developers working on a codebase.
+Code Auto-Formatters, code యొక్క surface syntax ను స్వయంచాలకంగా (automatically) శుభ్రంగా మరియు స్థిరంగా (consistent) మారుస్తాయి.
 
-Some tools such as Prettier are [highly configurable](https://prettier.io/docs/configuration); you should check in the configuration file into [version control](/2026/version-control/) for your project. Other tools, such as [Black](https://github.com/psf/black) and [gofmt](https://pkg.go.dev/cmd/gofmt) have limited or no configurability, to reduce [bikeshedding](https://en.wikipedia.org/wiki/Law_of_triviality).
+దీంతో మీరు లోతైన (deep) మరియు క్లిష్టమైన (challenging) సమస్యలపై దృష్టి పెట్టవచ్చు. అదే సమయంలో, formatting tool సాధారణమైన (mundane) విషయాలను చూసుకుంటుంది.
 
-You can set up [IDE integration](/2026/development-environment/#code-intelligence-and-language-servers) with your code formatter, so that your code will be auto-formatted as you type or when you save a file. You can also add an [EditorConfig](https://editorconfig.org/) file to your project, which communicates to your IDE certain project-level settings like indent size for each file type.
+ఉదాహరణకు:
+
+- Strings కోసం `'` లేదా `"` syntax ను ఒకే విధంగా ఉంచడం
+- Binary operators చుట్టూ spaces ఉంచడం (`x+y` బదులుగా `x + y`)
+- `import` statements ను క్రమబద్ధంగా (sorted order) అమర్చడం
+- చాలా పొడవైన (over-length) lines ను నివారించడం
+
+Code Formatters యొక్క ప్రధాన ప్రయోజనాలలో ఒకటి, ఒకే codebase పై పనిచేసే అన్ని developers మధ్య code style ను ప్రమాణీకరించడం (standardize చేయడం).
+
+కొన్ని tools, ఉదాహరణకు Prettier, చాలా ఎక్కువగా configurable గా ఉంటాయి.
+
+అంటే, formatting behaviour ను మీ అవసరాలకు అనుగుణంగా మార్చుకోవచ్చు.
+
+అలాంటి సందర్భాల్లో, configuration file ను project యొక్క [Version Control](/2026/version-control/) లో commit చేయడం మంచిది.
+
+ఇంకొన్ని tools, ఉదాహరణకు:
+
+- [Black](https://github.com/psf/black)
+- [gofmt](https://pkg.go.dev/cmd/gofmt)
+
+చాలా తక్కువ configurability లేదా ఎలాంటి configurability ఇవ్వవు.
+
+దీనికి ఒక ముఖ్యమైన కారణం ఉంది:
+
+**Bikeshedding** ను తగ్గించడం.
+
+అంటే, అసలు ముఖ్యమైన engineering సమస్యల కంటే, చిన్న stylistic విషయాలపై అనవసరమైన చర్చలు జరగకుండా చూడడం.
+
+మీ Code Formatter ను IDE తో integrate చేయవచ్చు.
+
+దీంతో:
+
+- మీరు type చేస్తున్నప్పుడు
+- లేదా file ను save చేస్తున్నప్పుడు
+
+code స్వయంచాలకంగా format అవుతుంది.
+
+అదనంగా, project లో ఒక [EditorConfig](https://editorconfig.org/) file ను కూడా చేర్చవచ్చు.
+
+ఈ file ద్వారా IDE కు project-level settings గురించి సమాచారం అందించవచ్చు.
+
+ఉదాహరణకు:
+
+- Indentation size
+- Tab లేదా spaces వినియోగం
+- వివిధ file types కు సంబంధించిన formatting preferences
+
+ఇలాంటి settings ను project అంతటా ఒకే విధంగా అమలు చేయవచ్చు.
 
 # Linting
 
-Linters run static analysis (analyze your code without running it) to find antipatterns and potential issues in your code. These tools go deeper than autoformatters, looking beyond surface syntax. The depth of analysis varies by tool.
+Linters, **Static Analysis** ను ఉపయోగించి (అంటే code ను run చేయకుండా విశ్లేషించి) మీ code లోని antipatterns మరియు సంభావ్య (potential) సమస్యలను గుర్తిస్తాయి.
 
-Linters come equipped with lists of _rules_, with presets that can be configured on a project-level basis. Some linter rules produce false positives, so you can disable them on a per-file or per-line basis.
+ఈ tools, auto-formatters కంటే మరింత లోతుగా (deeper) విశ్లేషిస్తాయి. అవి కేవలం surface syntax ను మాత్రమే కాకుండా, code యొక్క నిర్మాణం (structure) మరియు నాణ్యత (quality) ను కూడా పరిశీలిస్తాయి.
 
-Good linters will have built-in help or documentation that explains each linter rule --- what the rule is looking for, why it's bad, and what's a better alternative for the code pattern. For example, see the documentation for the [SIM102](https://docs.astral.sh/ruff/rules/collapsible-if/) rule in [Ruff](https://docs.astral.sh/ruff/) which catches unnecessarily nested `if` statements in Python code.
+విశ్లేషణ యొక్క లోతు (depth of analysis) tool ను బట్టి మారుతూ ఉంటుంది.
 
-Some linters can not only flag issues but also automatically fix certain issues for you.
+Linters లో సాధారణంగా అనేక **Rules** ఉంటాయి.
 
-Aside from language-specific linters, another tool that might come in handy is [semgrep](https://github.com/semgrep/semgrep), a "semantic grep" tool that works at the AST level (rather than character level, like grep) and supports many languages. You can use semgrep to easily write custom linter rules for your projects. For example, if you wanted to prevent the dangerous `subprocess.Popen(..., shell=True)` in Python, you could find that code pattern with:
+ఈ rules కోసం project స్థాయిలో (project-level) configure చేయగల presets కూడా అందుబాటులో ఉంటాయి.
+
+కొన్ని linter rules, కొన్నిసార్లు false positives ను ఉత్పత్తి చేయవచ్చు.
+
+అలాంటి సందర్భాల్లో, మీరు ఆ rules ను:
+
+- ఒక నిర్దిష్ట file కోసం
+- లేదా ఒక నిర్దిష్ట line కోసం
+
+disable చేయవచ్చు.
+
+మంచి linters, ప్రతి rule గురించి స్పష్టమైన documentation లేదా built-in help ను అందిస్తాయి.
+
+అందులో సాధారణంగా ఈ విషయాలు ఉంటాయి:
+
+- ఆ rule ఏమి గుర్తించడానికి ప్రయత్నిస్తోంది?
+- ఆ pattern ఎందుకు సమస్యాత్మకమైనది?
+- దానికి బదులుగా ఏ విధానం మెరుగైనది?
+
+ఉదాహరణకు, [Ruff](https://docs.astral.sh/ruff/) లోని [SIM102](https://docs.astral.sh/ruff/rules/collapsible-if/) rule, Python code లో అనవసరంగా nested అయిన `if` statements ను గుర్తిస్తుంది.
+
+కొన్ని linters కేవలం సమస్యలను గుర్తించడం మాత్రమే కాకుండా, వాటిలో కొన్నింటిని స్వయంచాలకంగా (automatically) సరిచేయగలవు కూడా.
+
+Language-specific linters తో పాటు, మరో ఉపయోగకరమైన tool **semgrep**.
+
+[semgrep](https://github.com/semgrep/semgrep) అనేది ఒక **Semantic Grep** tool.
+
+సాధారణ `grep` character స్థాయిలో (character level) పనిచేస్తుంది.
+
+కానీ semgrep, **AST (Abstract Syntax Tree)** స్థాయిలో పనిచేస్తుంది.
+
+దీంతో code యొక్క అర్థాన్ని (semantics) బట్టి patterns ను గుర్తించగలదు.
+
+ఇది అనేక programming languages ను support చేస్తుంది.
+
+మీ projects కోసం custom linter rules రూపొందించడానికి semgrep చాలా ఉపయోగపడుతుంది.
+
+ఉదాహరణకు, Python లో ప్రమాదకరమైన:
+
+```python
+subprocess.Popen(..., shell=True)
+```
+
+pattern ను ఉపయోగించకుండా నిరోధించాలనుకుంటే, semgrep ద్వారా ఆ code ను సులభంగా గుర్తించవచ్చు:
 
 ```bash
 semgrep -l python -e "subprocess.Popen(..., shell=True, ...)"
 ```
 
+ఈ command, Python files లో `subprocess.Popen(..., shell=True)` ఉపయోగించిన అన్ని స్థానాలను గుర్తిస్తుంది.
+
 # Testing
 
-Software testing is a standard technique to increase your confidence in the correctness of your code. You write code, and then you write code that exercises the code you wrote and raises an error if the code doesn't work as expected.
+Software Testing అనేది మీ code సరైనదిగా (correct) పనిచేస్తుందనే నమ్మకాన్ని పెంచడానికి ఉపయోగించే ప్రామాణిక (standard) పద్ధతి.
 
-You can write tests for chunks of code at different levels of granularity: _unit tests_ for individual functions, _integration tests_ for interaction between modules or services, and _functional tests_ for end-to-end scenarios. You can do _test-driven development_, where you write tests before you write any implementation code. When you find bugs in your code, you can write _regression tests_, so you'll catch if the functionality ever breaks in the future. You can write _property-based tests_, pioneered in [QuickCheck](https://hackage.haskell.org/package/QuickCheck) in Haskell, and implemented in many libraries, like [Hypothesis](https://hypothesis.readthedocs.io/) for Python. Which approach to testing is right depends on your project; likely, you will adopt some combination.
+దీని ప్రాథమిక ఆలోచన:
 
-If your program has external dependencies like a database or web API, it may be helpful to _mock_ those dependencies in your tests, rather than have your code interact with third-party dependencies at test time.
+- ముందుగా మీరు code రాస్తారు
+- తర్వాత, ఆ code ను పరీక్షించే (exercise చేసే) మరో code ను రాస్తారు
+- ఆశించిన విధంగా పనిచేయకపోతే, test error ను చూపిస్తుంది
 
-## Code coverage
+Tests ను వివిధ స్థాయిలలో (levels of granularity) రాయవచ్చు:
 
-Code coverage is a metric by which you can measure how good your tests are. Code coverage looks at which lines of your code are executed when your tests are run, so you can ensure you are covering all code paths. Code coverage tools can show you line-by-line coverage to guide you in writing tests. Services such as [Codecov](https://app.codecov.io) provide web interfaces for tracking and viewing code coverage over the history of a project.
+- **Unit Tests** — ఒక్కో function లేదా చిన్న code unit ను పరీక్షిస్తాయి
+- **Integration Tests** — modules లేదా services మధ్య పరస్పర చర్యలను (interactions) పరీక్షిస్తాయి
+- **Functional Tests** — పూర్తిస్థాయి end-to-end scenarios ను పరీక్షిస్తాయి
 
-Like any metric, code coverage is not perfect; don't over-index on coverage, focus on writing high-quality tests.
+మీరు **Test-Driven Development (TDD)** ను కూడా అనుసరించవచ్చు.
 
-# Pre-commit hooks
+ఈ విధానంలో:
 
-Git pre-commit [hooks](https://git-scm.com/book/en/v2/Customizing-Git-Git-Hooks), made easier by the [pre-commit](https://pre-commit.com/) framework, automatically run user-specified code prior to every Git commit. Projects commonly use pre-commit hooks to run formatters and linters, and sometimes tests, automatically before every commit, to ensure that committed code matches the project code style and is free of certain issues.
+1. ముందుగా tests రాస్తారు
+2. తర్వాత ఆ tests ను pass చేయడానికి implementation code రాస్తారు
 
-# Continuous integration
+మీ code లో bugs కనిపించినప్పుడు, వాటి కోసం **Regression Tests** రాయవచ్చు.
 
-Continuous integration (CI) services like [GitHub Actions](https://github.com/features/actions) can run scripts for you every time you push code (or on every pull request, or on a schedule). Developers commonly use CI services to run code quality tools including formatters, linters, and tests. For compiled languages, you can ensure code compiles; for statically typed languages, you can make sure it type checks. Running CI every push of new commits can catch errors introduced into the main version of the code; running on pull requests can catch issues with contributor submissions; running on a schedule can catch issues with external dependencies (e.g., a developer accidentally releases a breaking change as [semver-compatible](/2026/shipping-code/#releases--versioning)).
+దీంతో:
 
-Because CI scripts run separately from developer machines, you can easily run long-running jobs there. This can be leveraged, for example, to run a _matrix_ of tests across different operating systems and programming language versions to ensure that the software works properly across all of them.
+- ఆ bug ఒకసారి fix అయిన తర్వాత
+- భవిష్యత్తులో అదే functionality మళ్లీ చెడిపోతే
 
-Generally, the script running in CI will not directly make changes to your code: it will run tools in "check-only" mode rather than "fix" mode, so for example, the auto-formatter will raise an error when the code is not compliant with the format.
+test వెంటనే గుర్తిస్తుంది.
 
-Repositories often include [status badges](https://docs.github.com/en/actions/how-tos/monitor-workflows/add-a-status-badge) in their README, showing CI status and other information such as code coverage. For example, below is Missing Semester's current build status.
+మీరు **Property-Based Tests** కూడా రాయవచ్చు.
 
-[![Build Status](https://github.com/missing-semester/missing-semester/actions/workflows/build.yml/badge.svg)](https://github.com/missing-semester/missing-semester/actions/workflows/build.yml) [![Links Status](https://github.com/missing-semester/missing-semester/actions/workflows/links.yml/badge.svg)](https://github.com/missing-semester/missing-semester/actions/workflows/links.yml)
+ఈ విధానాన్ని Haskell లోని [QuickCheck](https://hackage.haskell.org/package/QuickCheck) ప్రాచుర్యంలోకి తీసుకువచ్చింది.
 
-> Our [links checker](https://github.com/missing-semester/missing-semester/blob/master/.github/workflows/links.yml), which uses the [proof-html](https://github.com/anishathalye/proof-html) GitHub Action is often failing, usually due to issues with third-party websites. Still, it has helped us catch and fix many broken links (sometimes due to typos, most of the time due to websites moving around content without adding redirects or websites disappearing).
+ఇప్పుడు అనేక languages లో దీనికి implementations ఉన్నాయి.
 
-A good way to learn the particulars of CI services, formatters, linters, and testing libraries is by example. Find high-quality open-source projects on GitHub---the more similar to your project in programming language, domain, size and scope, and so on, the better---and study their `pyproject.toml`, `.github/workflows/`, `DEVELOPMENT.md`, and other relevant files.
+ఉదాహరణకు:
 
-## Continuous deployment
+- Python కోసం [Hypothesis](https://hypothesis.readthedocs.io/)
 
-Continuous deployment makes use of CI infrastructure to actually _deploy_ changes. For example, the Missing Semester repository uses continuous deployment to GitHub pages so that whenever we `git push` updated lecture notes, the site is automatically built and deployed. You can build other types of [artifacts](/2026/shipping-code/) in CI, such as binaries for applications or Docker images for services.
+Property-Based Testing లో, ప్రతి input-output pair కోసం tests రాయడం కంటే, code ఎప్పుడూ పాటించాల్సిన properties లేదా rules ను నిర్వచిస్తారు.
 
-# Command runners
+ఏ testing approach ఉపయోగించాలో మీ project అవసరాలపై ఆధారపడి ఉంటుంది.
 
-Command runners like [just](https://github.com/casey/just) simplify the task of running commands in the context of a project. As you build up code quality infrastructure for your project, you don't want to make your developers memorize commands like `uv run ruff check --fix`. With a command runner, this can turn into `just lint`, and you can have analogous invocations like `just format`, `just typecheck`, etc., for all the different tools a developer might want to run for your project.
+చాలా సందర్భాల్లో, ఒకే విధానాన్ని కాకుండా అనేక testing techniques కలయికను (combination) ఉపయోగిస్తారు.
 
-Some language-specific project or package managers have built-in support for such functionality, which means you don't need to use a language-agnostic tool like `just`. For example, the `scripts` section of a `package.json` for [npm](https://nodejs.org/en/learn/getting-started/an-introduction-to-the-npm-package-manager) (Node.js) and the `tool.hatch.envs.*.scripts` sections of a `pyproject.toml` for [Hatch](https://hatch.pypa.io/) (Python) support this functionality.
+మీ application కు బాహ్య ఆధారాలు (external dependencies) ఉంటే, ఉదాహరణకు:
 
-# Regular expressions
+- Database
+- Web API
+- Third-party Service
 
-_Regular expressions_, commonly abbreviated as "regex", is a language used to represent sets of strings. Regex patterns are commonly used for pattern matching in various contexts such as command-line tools and IDEs. For example, [ag](https://github.com/ggreer/the_silver_searcher) supports regex patterns for codebase-wide search (e.g., `ag "import .* as .*"` will find all renamed imports in Python), and [go test](https://pkg.go.dev/cmd/go#hdr-Test_packages) supports a `-run [regexp]` option for selecting a subset of tests. Furthermore, programming languages have built-in support or third-party libraries for regular expression matching, so you can use regexes for functionality such as pattern matching, validation, and parsing.
+Tests సమయంలో వాటితో నేరుగా communicate చేయడం ఎల్లప్పుడూ ఉత్తమం కాదు.
 
-To help build intuition, below are some examples of regex patterns. In this lecture, we use [Python regex syntax](https://docs.python.org/3/library/re.html). There are many flavors of regex, with slight variation between them, especially in the more sophisticated functionality. You can use an online regex tester like [regex101](https://regex101.com/) to develop and debug regular expressions.
+అలాంటి సందర్భాల్లో, ఆ dependencies ను **Mock** చేయడం ఉపయోగకరంగా ఉంటుంది.
 
-- `abc` --- matches the literal "abc".
-- `missing|semester` --- matches the string "missing" or the string "semester".
-- `\d{4}-\d{2}-\d{2}` --- matches dates in YYYY-MM-DD format, such as "2026-01-14". Beyond ensuring that the string consists of four digits, a dash, two digits, a dash, and two digits, this does not validate the date, so "2026-01-99" matches this regex pattern too.
-- `.+@.+` --- matches email addresses, strings that contain some text, then an "@", and then some more text. This does only the most basic validation and matches strings like "nonsense@@@email". A regex that matches email addresses with no false positives or negatives [exists](https://pdw.ex-parrot.com/Mail-RFC822-Address.html) but is impractical.
+Mocking వల్ల:
 
-## Regex syntax
+- Tests వేగంగా run అవుతాయి
+- External services అందుబాటులో లేకపోయినా tests పనిచేస్తాయి
+- Third-party systems వల్ల tests విఫలమయ్యే అవకాశాలు తగ్గుతాయి
+- Tests మరింత స్థిరంగా (reliable) మారుతాయి
 
-You can find a comprehensive guide to regex syntax in [this documentation](https://docs.python.org/3/library/re.html#regular-expression-syntax) (or one of many other resources available online). Here are some of the basic building blocks:
+అందువల్ల, external dependencies ఉన్న projects లో mocking ఒక ముఖ్యమైన testing technique గా పరిగణించబడుతుంది.
 
-- `abc` matches the literal string, when the characters have no special meaning (in this example, "abc")
-- `.` matches any single character
-- `[abc]` matches a single character contained in the brackets (in this example, "a", "b", or "c")
-- `[^abc]` matches a single character except those contained in the brackets (e.g., "d")
-- `[a-f]` matches a single character contained in the range indicated in the brackets (e.g., "c", but not "q")
-- `a|b` matches either pattern (e.g., "a" or "b")
-- `\d` matches any digit character (e.g., "3")
-- `\w` matches any word character (e.g., "x")
-- `\b` matches any word _boundary_ (e.g., in the string "missing semester", matches just before the "m", just after the "g", just before the "s", and just after the "r")
-- `(...)` matches the group of a pattern
-- `...?` matches zero or one of a pattern, such as `words?` to match "word" or "words"
-- `...*` matches any number of a pattern, such as `.*` to match any number of any character
-- `...+` matches one or more of a pattern, such as `\d+` to match any non-zero number of digits
-- `...{N}` matches exactly N of a pattern, such as `\d{4}` for 4 digits
-- `\.` matches a literal "."
-- `\\` matches a literal "\\"
-- `^` matches the start of the line
-- `$` matches the end of the line
+## Code Coverage
 
-## Capture groups and references
+**Code Coverage** అనేది మీ tests ఎంత సమర్థవంతంగా ఉన్నాయో కొలవడానికి ఉపయోగించే ఒక metric.
 
-If you use regex groups `(...)`, you can refer to sub-parts of the match for extraction or search-and-replace purposes. For example, to extract just the month from a YYYY-MM-DD style date, you can use the following Python code:
+Tests run చేసినప్పుడు, మీ code లోని ఏ lines execute అయ్యాయో Code Coverage పరిశీలిస్తుంది.
+
+దీంతో:
+
+- అన్ని code paths పరీక్షించబడుతున్నాయో లేదో తెలుసుకోవచ్చు
+- ఇంకా test చేయని భాగాలను గుర్తించవచ్చు
+- కొత్త tests ఎక్కడ అవసరమో అర్థం చేసుకోవచ్చు
+
+చాలా Code Coverage tools, line-by-line coverage వివరాలను చూపిస్తాయి.
+
+దీని వల్ల, coverage తక్కువగా ఉన్న ప్రాంతాలను గుర్తించి వాటి కోసం tests రాయడం సులభమవుతుంది.
+
+[Codecov](https://app.codecov.io) వంటి services, project చరిత్ర అంతటా Code Coverage ను track చేయడానికి మరియు visual గా చూడడానికి web interfaces ను అందిస్తాయి.
+
+అయితే, ప్రతి metric లాగే Code Coverage కూడా పరిపూర్ణమైనది కాదు.
+
+Coverage శాతంపై మాత్రమే దృష్టి పెట్టకండి.
+
+ఉదాహరణకు:
+
+- 100% coverage ఉన్న tests కూడా నాణ్యత లేనివి కావచ్చు
+- 80% coverage ఉన్న tests చాలా బలమైనవిగా ఉండవచ్చు
+
+అందువల్ల, coverage సంఖ్య కంటే **అధిక నాణ్యత గల tests** రాయడంపైనే ప్రధాన దృష్టి ఉండాలి.
+
+# Pre-commit Hooks
+
+Git లోని **Pre-commit Hooks** అనేవి, ప్రతి commit కు ముందు స్వయంచాలకంగా (automatically) run అయ్యే scripts.
+
+Git Hooks ను ఉపయోగించడం సులభతరం చేయడానికి [pre-commit](https://pre-commit.com/) framework విస్తృతంగా ఉపయోగించబడుతుంది.
+
+Pre-commit hooks యొక్క ముఖ్య ఉద్దేశ్యం:
+
+Commit చేయబడే code, project standards కు అనుగుణంగా ఉందో లేదో ముందుగానే నిర్ధారించడం.
+
+చాలా projects లో, Pre-commit hooks ద్వారా ఈ పనులు స్వయంచాలకంగా నిర్వహించబడతాయి:
+
+- Formatters ను run చేయడం
+- Linters ను run చేయడం
+- కొన్నిసార్లు Tests ను కూడా run చేయడం
+
+ఇవి ప్రతి commit కు ముందు execute అవుతాయి.
+
+దీంతో:
+
+- Commit చేసిన code project యొక్క code style ను అనుసరిస్తుంది
+- సాధారణ తప్పులు (common issues) ముందుగానే గుర్తించబడతాయి
+- Review సమయంలో అనవసరమైన formatting లేదా linting సమస్యలు తగ్గుతాయి
+- Code Quality మరింత స్థిరంగా ఉంటుంది
+
+అంటే, Pre-commit Hooks అనేవి "చెడు code repository లోకి వెళ్లకముందే" దాన్ని తనిఖీ చేసే మొదటి రక్షణ పొర (first line of defense) లాంటివి.
+
+# Continuous Integration
+
+**Continuous Integration (CI)** services, ఉదాహరణకు [GitHub Actions](https://github.com/features/actions), మీరు code ను push చేసిన ప్రతిసారి (లేదా ప్రతి Pull Request పై, లేదా నిర్దిష్ట schedule ప్రకారం) scripts ను స్వయంచాలకంగా run చేయగలవు.
+
+Developers సాధారణంగా CI services ను వివిధ Code Quality tools ను అమలు చేయడానికి ఉపయోగిస్తారు.
+
+ఉదాహరణకు:
+
+- Formatters
+- Linters
+- Tests
+
+Compiled languages లో, CI ద్వారా code విజయవంతంగా compile అవుతుందో లేదో నిర్ధారించవచ్చు.
+
+Statically Typed Languages లో, code type checking ను విజయవంతంగా pass అవుతుందో లేదో ధృవీకరించవచ్చు.
+
+కొత్త commits push చేసిన ప్రతిసారి CI ను run చేయడం వల్ల, code యొక్క ప్రధాన version (main branch) లోకి చేరిన errors ను త్వరగా గుర్తించవచ్చు.
+
+Pull Requests పై CI ను run చేయడం వల్ల:
+
+- Contributors పంపిన changes లోని సమస్యలను merge కు ముందే గుర్తించవచ్చు.
+
+Schedule ప్రకారం CI jobs ను run చేయడం వల్ల:
+
+- External dependencies కారణంగా వచ్చే సమస్యలను గుర్తించవచ్చు.
+
+ఉదాహరణకు:
+
+ఒక developer పొరపాటున breaking change ను విడుదల చేసినా, దాన్ని [SemVer-compatible](/2026/shipping-code/#releases--versioning) release గా ప్రకటించి ఉండవచ్చు.
+
+అలాంటి పరిస్థితుల్లో scheduled CI runs సమస్యను ముందుగానే గుర్తించగలవు.
+
+CI scripts, developers machines నుండి పూర్తిగా వేరుగా (independently) run అవుతాయి.
+
+దీని వల్ల, developer machine పై run చేయడానికి ఎక్కువ సమయం పట్టే jobs ను కూడా CI లో సులభంగా అమలు చేయవచ్చు.
+
+దీనికి ఒక మంచి ఉదాహరణ **Test Matrix**.
+
+Test Matrix ద్వారా:
+
+- వేర్వేరు Operating Systems పై
+- వేర్వేరు Programming Language versions పై
+
+ఒకే test suite ను run చేయవచ్చు.
+
+దీంతో software అన్ని environments లో సరిగ్గా పనిచేస్తుందో లేదో నిర్ధారించవచ్చు.
+
+సాధారణంగా, CI లో run అయ్యే scripts మీ code ను నేరుగా మార్చవు.
+
+అవి ఎక్కువగా tools ను **check-only mode** లో run చేస్తాయి.
+
+**fix mode** లో కాదు.
+
+ఉదాహరణకు:
+
+- Auto-formatter, code ను స్వయంగా format చేయదు
+- బదులుగా, code formatting rules కు అనుగుణంగా లేకపోతే error ను చూపిస్తుంది
+
+దీంతో developers:
+
+- సమస్యలను గుర్తించగలరు
+- అవసరమైన మార్పులను స్థానికంగా (locally) చేయగలరు
+- తర్వాత సరిచేసిన code ను మళ్లీ push చేయగలరు
+
+అంటే, CI యొక్క ప్రధాన లక్ష్యం code ను ఆటోమేటిక్‌గా సరిచేయడం కాదు; సమస్యలను గుర్తించి వాటిని developers దృష్టికి తీసుకురావడం.
+
+Repositories లో తరచుగా README లో **Status Badges** ను చేర్చుతారు.
+
+ఈ badges సాధారణంగా ఈ సమాచారాన్ని చూపిస్తాయి:
+
+- CI (Continuous Integration) Build Status
+- Code Coverage
+- Test Results
+- ఇతర Project Health Metrics
+
+ఉదాహరణకు, Missing Semester project యొక్క ప్రస్తుత build status ను README లో badges ద్వారా చూపిస్తారు.
+
+```md
+[![Build Status](https://github.com/missing-semester/missing-semester/actions/workflows/build.yml/badge.svg)](...)
+[![Links Status](https://github.com/missing-semester/missing-semester/actions/workflows/links.yml/badge.svg)](...)
+```
+
+ఈ badges ద్వారా, project ప్రస్తుతం సక్రమంగా build అవుతోందా లేదా tests విజయవంతంగా run అవుతున్నాయా అనే విషయాన్ని ఒక చూపులోనే తెలుసుకోవచ్చు.
+
+> మా Links Checker తరచుగా fail అవుతూ ఉంటుంది. సాధారణంగా దీనికి కారణం third-party websites లోని సమస్యలే.
+>
+> అయినప్పటికీ, ఈ checker మాకు అనేక broken links ను గుర్తించి సరిచేయడంలో సహాయపడింది.
+>
+> కొన్ని సందర్భాల్లో అవి typing mistakes వల్ల వస్తాయి.
+>
+> కానీ ఎక్కువగా:
+>
+> - Websites తమ content ను వేరే చోటుకు మార్చడం
+> - Redirects ఇవ్వకుండా URLs మార్చడం
+> - లేదా Websites పూర్తిగా కనుమరుగవడం
+>
+> వంటి కారణాల వల్ల broken links ఏర్పడతాయి.
+
+CI Services, Formatters, Linters మరియు Testing Libraries గురించి లోతుగా నేర్చుకోవడానికి ఉత్తమ మార్గాలలో ఒకటి **ఉత్తమ Open Source Projects ను అధ్యయనం చేయడం**.
+
+GitHub లో ఉన్న అధిక నాణ్యత గల projects ను పరిశీలించండి.
+
+సాధ్యమైనంత వరకు, మీ project కు ఈ అంశాల్లో దగ్గరగా ఉండే projects ను ఎంచుకోండి:
+
+- Programming Language
+- Domain
+- Project Size
+- Project Scope
+- Architecture
+
+ఇలాంటి projects ను అధ్యయనం చేయడం వల్ల, వాస్తవ ప్రపంచంలో (real-world) best practices ఎలా అమలు చేయబడుతున్నాయో తెలుసుకోవచ్చు.
+
+ప్రత్యేకంగా ఈ files ను పరిశీలించండి:
+
+- `pyproject.toml`
+- `.github/workflows/`
+- `DEVELOPMENT.md`
+- `CONTRIBUTING.md`
+- `README.md`
+- మరియు ఇతర development-related configuration files
+
+ఈ files ద్వారా మీరు:
+
+- Formatting ఎలా configure చేశారో
+- Linting ఎలా అమలు చేస్తున్నారో
+- Tests ఎలా run చేస్తున్నారో
+- CI Pipelines ఎలా రూపొందించారో
+- Development workflows ఎలా నిర్వహిస్తున్నారో
+
+నేరుగా నేర్చుకోవచ్చు.
+
+చాలా సందర్భాల్లో, documentation చదవడం కంటే మంచి Open Source Project ను పరిశీలించడం ద్వారా మరింత వేగంగా మరియు ప్రాయోగికంగా (practically) నేర్చుకోవచ్చు.
+
+## Continuous Deployment
+
+**Continuous Deployment (CD)** అనేది Continuous Integration (CI) infrastructure ను ఉపయోగించి, changes ను స్వయంచాలకంగా (automatically) deploy చేసే ప్రక్రియ.
+
+ఉదాహరణకు, Missing Semester repository లో Continuous Deployment ను GitHub Pages తో ఉపయోగిస్తున్నారు.
+
+దీని వల్ల:
+
+- Lecture Notes లో మార్పులు చేసి
+- `git push` చేసిన వెంటనే
+
+website స్వయంచాలకంగా:
+
+1. Build అవుతుంది
+2. Deploy అవుతుంది
+
+అంటే, manual deployment steps అవసరం ఉండవు.
+
+CI ద్వారా కేవలం websites మాత్రమే కాదు, ఇతర రకాల **Artifacts** ను కూడా build చేయవచ్చు.
+
+ఉదాహరణలు:
+
+- Application Binaries
+- Docker Images
+- Release Packages
+- Deployment Bundles
+
+అంటే, CI/CD pipeline software ను build చేయడం నుంచి production లో deploy చేయడం వరకు మొత్తం ప్రక్రియను ఆటోమేట్ చేయగలదు.
+
+# Command Runners
+
+**Command Runners** అనేవి project సందర్భంలో commands ను సులభంగా run చేయడానికి ఉపయోగించే tools.
+
+ఒక project పెరుగుతున్న కొద్దీ, developers అనేక Code Quality tools ను run చేయాల్సి వస్తుంది.
+
+ఉదాహరణకు:
+
+```bash
+uv run ruff check --fix
+```
+
+లాంటి commands ను ప్రతి developer గుర్తుంచుకోవడం అనవసరమైన భారంగా మారుతుంది.
+
+ఇక్కడ Command Runners ఉపయోగపడతాయి.
+
+ఉదాహరణకు, [just](https://github.com/casey/just) ను ఉపయోగిస్తే:
+
+```bash
+just lint
+```
+
+అనే సులభమైన command వెనుక:
+
+```bash
+uv run ruff check --fix
+```
+
+లేదా మరింత క్లిష్టమైన command run కావచ్చు.
+
+అదే విధంగా:
+
+```bash
+just format
+```
+
+```bash
+just typecheck
+```
+
+```bash
+just test
+```
+
+వంటి commands ను కూడా నిర్వచించవచ్చు.
+
+దీంతో developers:
+
+- అసలు tool commands గుర్తుంచుకోవాల్సిన అవసరం ఉండదు
+- Project workflows మరింత సరళంగా ఉంటాయి
+- కొత్త developers onboarding సులభమవుతుంది
+
+కొన్ని language-specific package managers మరియు project managers లో ఈ functionality ఇప్పటికే built-in గా ఉంటుంది.
+
+అలాంటి సందర్భాల్లో, `just` వంటి language-agnostic tool ను ఉపయోగించాల్సిన అవసరం ఉండకపోవచ్చు.
+
+ఉదాహరణలు:
+
+### Node.js (npm)
+
+`package.json` లోని:
+
+```json
+"scripts": {
+  "lint": "...",
+  "test": "...",
+  "build": "..."
+}
+```
+
+section ద్వారా commands ను నిర్వచించవచ్చు.
+
+తర్వాత:
+
+```bash
+npm run lint
+```
+
+```bash
+npm run test
+```
+
+వంటి commands ను ఉపయోగించవచ్చు.
+
+### Python (Hatch)
+
+`pyproject.toml` లోని:
+
+```toml
+tool.hatch.envs.*.scripts
+```
+
+sections ద్వారా scripts ను నిర్వచించవచ్చు.
+
+దీంతో developers ఒకే విధమైన, సులభమైన commands ద్వారా project tooling ను ఉపయోగించగలరు.
+
+మొత్తానికి, Command Runners యొక్క ప్రధాన లక్ష్యం:
+
+- Commands ను గుర్తుంచుకోవాల్సిన అవసరాన్ని తగ్గించడం
+- Development workflows ను ప్రమాణీకరించడం (standardize)
+- Project tooling ను ఉపయోగించడం సులభతరం చేయడం
+
+# Regular Expressions
+
+**Regular Expressions**, సాధారణంగా **Regex** అని పిలుస్తారు, అనేది strings సమితులను (sets of strings) వివరించడానికి ఉపయోగించే ఒక ప్రత్యేక భాష (language).
+
+Regex patterns ను వివిధ సందర్భాల్లో pattern matching కోసం విస్తృతంగా ఉపయోగిస్తారు.
+
+ఉదాహరణకు:
+
+- Command-line tools
+- IDEs
+- Search tools
+- Programming languages
+
+వంటి అనేక చోట్ల Regex ఉపయోగపడుతుంది.
+
+ఉదాహరణకు, [ag](https://github.com/ggreer/the_silver_searcher) అనే tool, మొత్తం codebase అంతటా regex ఆధారిత search ను support చేస్తుంది.
+
+ఉదాహరణ:
+
+```bash
+ag "import .* as .*"
+```
+
+ఈ command, Python లో rename చేసిన imports అన్నింటినీ కనుగొంటుంది.
+
+అదేవిధంగా, [go test](https://pkg.go.dev/cmd/go#hdr-Test_packages) command లో:
+
+```bash
+-run [regexp]
+```
+
+అనే option ఉంటుంది.
+
+దీని ద్వారా, regex pattern కు సరిపడే tests మాత్రమే run చేయవచ్చు.
+
+అలాగే, చాలా programming languages లో:
+
+- Built-in Regex support
+- లేదా Third-party Regex libraries
+
+ఉంటాయి.
+
+వీటిని ఉపయోగించి:
+
+- Pattern Matching
+- Validation
+- Parsing
+
+వంటి పనులను చేయవచ్చు.
+
+Regex గురించి అవగాహన పెంచుకోవడానికి, కొన్ని ఉదాహరణలు చూద్దాం.
+
+ఈ lecture లో మనం **Python Regex Syntax** ను ఉపయోగిస్తున్నాము.
+
+Regex కు అనేక flavors (variants) ఉన్నాయి.
+
+వాటి మధ్య ముఖ్యంగా advanced features లో చిన్నచిన్న తేడాలు ఉండవచ్చు.
+
+Regex ను రూపొందించడానికి మరియు debug చేయడానికి:
+
+- [regex101](https://regex101.com/)
+
+వంటి online tools చాలా ఉపయోగపడతాయి.
+
+### Regex Examples
+
+- `abc`
+
+  `"abc"` అనే literal string ను match చేస్తుంది.
+
+- `missing|semester`
+
+  `"missing"` లేదా `"semester"` అనే strings లో ఏదో ఒకదాన్ని match చేస్తుంది.
+
+- `\d{4}-\d{2}-\d{2}`
+
+  YYYY-MM-DD format లో ఉన్న తేదీలను match చేస్తుంది.
+
+  ఉదాహరణ:
+
+  ```text
+  2026-01-14
+  ```
+
+  అయితే, ఇది కేవలం format ను మాత్రమే తనిఖీ చేస్తుంది.
+
+  అంటే:
+
+  - నాలుగు అంకెలు
+  - ఒక dash (`-`)
+  - రెండు అంకెలు
+  - మరో dash (`-`)
+  - రెండు అంకెలు
+
+  ఉన్నాయో లేదో మాత్రమే చూస్తుంది.
+
+  తేదీ నిజంగా చెల్లుబాటు అవుతుందో లేదో (valid date కాదో) తనిఖీ చేయదు.
+
+  కాబట్టి:
+
+  ```text
+  2026-01-99
+  ```
+
+  కూడా ఈ regex కు match అవుతుంది.
+
+- `.+@.+`
+
+  Email address లాంటి strings ను match చేస్తుంది.
+
+  అంటే:
+
+  - కొంత text
+  - తర్వాత `@`
+  - తర్వాత మరికొంత text
+
+  ఉండాలి.
+
+  ఉదాహరణ:
+
+  ```text
+  user@example.com
+  ```
+
+  అయితే, ఇది చాలా ప్రాథమిక (basic) validation మాత్రమే చేస్తుంది.
+
+  అందువల్ల:
+
+  ```text
+  nonsense@@@email
+  ```
+
+  వంటి చెల్లని strings కూడా match కావచ్చు.
+
+  False Positives మరియు False Negatives లేకుండా email addresses ను పూర్తిగా match చేసే regex ఒకటి ఉన్నప్పటికీ, అది చాలా క్లిష్టమైనది మరియు ప్రాయోగికంగా (practically) ఉపయోగించడం కష్టమైనది.
+
+## Regex Syntax
+
+Regex Syntax గురించి పూర్తి వివరాలు తెలుసుకోవాలంటే, [ఈ Documentation](https://docs.python.org/3/library/re.html#regular-expression-syntax) ను (లేదా ఆన్‌లైన్‌లో అందుబాటులో ఉన్న ఇతర Regex Guides ను) చూడవచ్చు.
+
+కింద కొన్ని ప్రాథమిక Regex Building Blocks ఇవ్వబడ్డాయి:
+
+- `abc`
+
+  Characters కు ప్రత్యేక అర్థం (special meaning) లేనప్పుడు, literal string ను match చేస్తుంది.
+
+  ఉదాహరణ:
+
+  ```text
+  abc
+  ```
+
+- `.`
+
+  ఏదైనా ఒకే ఒక్క character ను match చేస్తుంది.
+
+- `[abc]`
+
+  Brackets లో ఉన్న characters లో ఏదో ఒకదాన్ని match చేస్తుంది.
+
+  ఉదాహరణ:
+
+  ```text
+  a
+  b
+  c
+  ```
+
+- `[^abc]`
+
+  Brackets లో ఉన్న characters మినహా మిగిలిన ఏదైనా ఒక్క character ను match చేస్తుంది.
+
+  ఉదాహరణ:
+
+  ```text
+  d
+  x
+  5
+  ```
+
+- `[a-f]`
+
+  సూచించిన range లోని ఒక్క character ను match చేస్తుంది.
+
+  ఉదాహరణ:
+
+  ```text
+  c
+  ```
+
+  match అవుతుంది.
+
+  ```text
+  q
+  ```
+
+  match కాదు.
+
+- `a|b`
+
+  రెండు patterns లో ఏదో ఒకదాన్ని match చేస్తుంది.
+
+  ఉదాహరణ:
+
+  ```text
+  a
+  ```
+
+  లేదా
+
+  ```text
+  b
+  ```
+
+- `\d`
+
+  ఏదైనా digit (0-9) ను match చేస్తుంది.
+
+  ఉదాహరణ:
+
+  ```text
+  3
+  ```
+
+- `\w`
+
+  ఏదైనా word character ను match చేస్తుంది.
+
+  సాధారణంగా:
+
+  - అక్షరాలు (letters)
+  - సంఖ్యలు (digits)
+  - underscore (`_`)
+
+  ఇందులో ఉంటాయి.
+
+  ఉదాహరణ:
+
+  ```text
+  x
+  ```
+
+- `\b`
+
+  Word Boundary ను match చేస్తుంది.
+
+  ఉదాహరణకు:
+
+  ```text
+  missing semester
+  ```
+
+  అనే string లో:
+
+  - `missing` ప్రారంభానికి ముందు
+  - `missing` ముగిసిన వెంటనే
+  - `semester` ప్రారంభానికి ముందు
+  - `semester` ముగిసిన వెంటనే
+
+  boundary locations వద్ద match అవుతుంది.
+
+- `(...)`
+
+  ఒక pattern ను group చేయడానికి ఉపయోగిస్తారు.
+
+- `...?`
+
+  Pattern యొక్క **సున్నా లేదా ఒక occurrence** ను match చేస్తుంది.
+
+  ఉదాహరణ:
+
+  ```regex
+  words?
+  ```
+
+  ఇది:
+
+  ```text
+  word
+  ```
+
+  మరియు
+
+  ```text
+  words
+  ```
+
+  రెండింటినీ match చేస్తుంది.
+
+- `...*`
+
+  Pattern యొక్క **సున్నా లేదా అంతకంటే ఎక్కువ occurrences** ను match చేస్తుంది.
+
+  ఉదాహరణ:
+
+  ```regex
+  .*
+  ```
+
+  ఏ సంఖ్యలోనైనా characters ను match చేయగలదు.
+
+- `...+`
+
+  Pattern యొక్క **ఒకటి లేదా అంతకంటే ఎక్కువ occurrences** ను match చేస్తుంది.
+
+  ఉదాహరణ:
+
+  ```regex
+  \d+
+  ```
+
+  ఒకటి లేదా అంతకంటే ఎక్కువ digits ను match చేస్తుంది.
+
+- `...{N}`
+
+  Pattern ఖచ్చితంగా **N సార్లు** రావాలని సూచిస్తుంది.
+
+  ఉదాహరణ:
+
+  ```regex
+  \d{4}
+  ```
+
+  ఖచ్చితంగా నాలుగు digits ను match చేస్తుంది.
+
+- `\.`
+
+  Literal dot (`.`) character ను match చేస్తుంది.
+
+  ఎందుకంటే regex లో `.` కి ప్రత్యేక అర్థం ఉంది.
+
+- `\\`
+
+  Literal backslash (`\`) ను match చేస్తుంది.
+
+- `^`
+
+  Line ప్రారంభాన్ని (start of line) match చేస్తుంది.
+
+- `$`
+
+  Line ముగింపును (end of line) match చేస్తుంది.
+
+## Capture Groups మరియు References
+
+Regex లో groups `(...)` ఉపయోగించినప్పుడు, match అయిన string లోని నిర్దిష్ట భాగాలను (sub-parts) విడిగా సూచించవచ్చు.
+
+ఇవి ప్రధానంగా ఈ పనుల కోసం ఉపయోగపడతాయి:
+
+- Data Extraction
+- Search and Replace
+- Pattern Reuse
+
+ఉదాహరణకు, YYYY-MM-DD format లో ఉన్న తేదీ నుండి నెల (month) భాగాన్ని మాత్రమే తీసుకోవాలనుకుందాం.
+
+ఈ Python code ను చూడండి:
 
 ```python
 >>> import re
@@ -136,31 +923,352 @@ If you use regex groups `(...)`, you can refer to sub-parts of the match for ext
 '01'
 ```
 
-In your text editor, you can use reference capture groups in replace patterns. The syntax might vary between IDEs. For example, in VS Code, you can use variables like `$1`, `$2`, etc., and in Vim, you can use `\1`, `\2`, etc., to reference groups.
+ఇక్కడ:
 
-## Limitations
-
-[Regular languages](https://en.wikipedia.org/wiki/Regular_language) are powerful but limited; there are classes of strings that cannot be expressed as a standard regex (e.g., it is [not possible](https://en.wikipedia.org/wiki/Pumping_lemma_for_regular_languages) to write a regular expression that matches the set of strings {a^n b^n \| n &ge; 0}, the set of strings of a number of "a"s followed by the same number of "b"s; more practically, languages like HTML are not regular languages). In practice, modern regex engines support features like lookahead and backreferences that extend support beyond regular languages, and they are practically extremely useful, but it is important to know that they are still limited in their expressive power. For more sophisticated languages, you might need to reach for a more capable type of parser (for one example, see [pyparsing](https://github.com/pyparsing/pyparsing), a [PEG](https://en.wikipedia.org/wiki/Parsing_expression_grammar) parser).
-
-## Learning regex
-
-We recommend learning the fundamentals (what we have covered in this lecture), and then looking at regex references as you need them, rather than memorizing the entirety of the language.
-
-Conversational AI tools can be effective at helping you generating regex patterns. For example, try prompting your favorite LLM with the following query:
-
+```regex
+(\d{2})
 ```
+
+అనేది ఒక Capture Group.
+
+Regex match అయిన తర్వాత:
+
+```python
+.group(1)
+```
+
+మొదటి capture group లోని విలువను తిరిగి ఇస్తుంది.
+
+అందువల్ల:
+
+```text
+01
+```
+
+ఫలితంగా వస్తుంది.
+
+Text Editors మరియు IDEs లో కూడా Capture Groups చాలా ఉపయోగపడతాయి.
+
+ప్రత్యేకంగా Search and Replace సమయంలో.
+
+Replace Pattern లో, match అయిన groups ను మళ్లీ ఉపయోగించవచ్చు.
+
+Syntax IDE ను బట్టి మారుతుంది.
+
+ఉదాహరణకు:
+
+### VS Code
+
+```text
+$1
+$2
+$3
+```
+
+మొదటి, రెండో, మూడో capture groups ను సూచిస్తాయి.
+
+### Vim
+
+```text
+\1
+\2
+\3
+```
+
+అదే పనిని చేస్తాయి.
+
+దీంతో, క్లిష్టమైన text transformations ను చాలా సులభంగా చేయవచ్చు.
+
+## పరిమితులు (Limitations)
+
+Regex ఆధారపడే **Regular Languages** చాలా శక్తివంతమైనవే అయినప్పటికీ, వాటికి కొన్ని పరిమితులు ఉన్నాయి.
+
+కొన్ని string patterns ను సాధారణ Regex ద్వారా వ్యక్తీకరించడం సాధ్యం కాదు.
+
+ఉదాహరణకు:
+
+```text
+aⁿbⁿ
+```
+
+అంటే:
+
+```text
+ab
+aabb
+aaabbb
+aaaabbbb
+...
+```
+
+వంటి strings.
+
+ఇక్కడ:
+
+- "a" ల సంఖ్య
+- "b" ల సంఖ్య
+
+ఖచ్చితంగా సమానంగా ఉండాలి.
+
+ఇలాంటి pattern ను సాధారణ Regular Expression ద్వారా వ్రాయడం సాధ్యం కాదు.
+
+ఇది Regular Languages యొక్క సిద్ధాంతపరమైన (theoretical) పరిమితుల్లో ఒకటి.
+
+మరింత ప్రాయోగిక ఉదాహరణ:
+
+**HTML** ఒక Regular Language కాదు.
+
+అందువల్ల:
+
+> "Regex తో HTML ను parse చేద్దాం"
+
+అనే విధానం సాధారణంగా సరైనది కాదు.
+
+ఆధునిక Regex Engines కొన్ని advanced features ను అందిస్తాయి.
+
+ఉదాహరణకు:
+
+- Lookahead
+- Lookbehind
+- Backreferences
+
+ఇలాంటి features వల్ల, Regex సామర్థ్యం సాధారణ Regular Languages కంటే ఎక్కువ అవుతుంది.
+
+అందువల్ల, అవి వాస్తవ ప్రపంచంలో (real-world) చాలా ఉపయోగకరంగా ఉంటాయి.
+
+అయితే, వాటి వ్యక్తీకరణ సామర్థ్యానికి (expressive power) ఇంకా పరిమితులు ఉన్నాయని గుర్తుంచుకోవాలి.
+
+భాష (language) లేదా data structure మరింత క్లిష్టంగా ఉంటే, Regex సరిపోకపోవచ్చు.
+
+అలాంటి సందర్భాల్లో, మరింత శక్తివంతమైన **Parser** అవసరం అవుతుంది.
+
+ఉదాహరణకు:
+
+- [pyparsing](https://github.com/pyparsing/pyparsing)
+
+ఇది ఒక Parsing Library.
+
+ఇది **PEG (Parsing Expression Grammar)** ఆధారంగా పనిచేస్తుంది.
+
+Regex తో కష్టమైన లేదా అసాధ్యమైన parsing పనులను ఇలాంటి parsers సులభంగా నిర్వహించగలవు.
+
+## Regex నేర్చుకోవడం (Learning Regex)
+
+Regex లోని ప్రాథమిక అంశాలను (ఈ lecture లో చర్చించిన విషయాలను) బాగా అర్థం చేసుకోవాలని మేము సిఫారసు చేస్తున్నాము.
+
+అయితే, మొత్తం Regex language ను కంఠస్థం (memorize) చేయడానికి ప్రయత్నించాల్సిన అవసరం లేదు.
+
+దానికి బదులుగా:
+
+- Fundamentals ను నేర్చుకోండి
+- అవసరం వచ్చినప్పుడు Regex References లేదా Documentation ను చూడండి
+
+అనే విధానం మరింత ప్రయోజనకరంగా ఉంటుంది.
+
+ప్రస్తుతం Conversational AI tools కూడా Regex patterns రూపొందించడంలో చాలా ఉపయోగకరంగా ఉన్నాయి.
+
+ఉదాహరణకు, మీకు ఇష్టమైన LLM ను ఈ విధంగా అడగవచ్చు:
+
+```text
 Write a Python-style regex pattern that matches the requested path from log lines from Nginx. Here is an example log line:
 
 169.254.1.1 - - [09/Jan/2026:21:28:51 +0000] "GET /feed.xml HTTP/2.0" 200 2995 "-" "python-requests/2.32.3"
 ```
 
-# Exercises
+ఇలాంటి prompt ద్వారా, LLM:
 
-1. Configure a formatter, linter, and pre-commit hooks for a project you're working on. If you have lots of errors: autoformatting should take care of the format errors. For the linter errors, try using an [AI agent](/2026/agentic-coding/) to fix all the linter errors. Make sure the AI agent can run the linter and observe the results, so that it can run in an iterative loop to fix all the issues. Check the results carefully to ensure the AI doesn't break your code!
-1. Learn a testing library for a language you know and write a unit test for a project you're working on. Run a code coverage tool, generate an HTML-formatted coverage report, and observe the results. Can you find the lines that are covered? Your code coverage will likely be very low. Try manually writing some tests to improve it. Try using an [AI agent](/2026/agentic-coding/) to improve coverage; make sure the coding agent can run tests with coverage and produce a line-by-line coverage report, so it knows where to focus. Are the AI-generated tests actually good?
-1. Set up continuous integration to run on every push for a project you're working on. Have CI run formatting, linting, and tests. Break your code on purpose (e.g., introduce a linter violation), and ensure that CI catches it.
-1. Try writing a [regex pattern](#regular-expressions) and use the `grep` [command-line tool](/2026/course-shell/) to find occurrences of `subprocess.Popen(..., shell=True)` in your code. Now, try to "break" the regex pattern. Does [semgrep](#linting) still successfully match the dangerous code that trips up your grep invocation?
-1. Practice regex search-and-replace in your IDE or text editor by replacing the `-` [Markdown bullet markers](https://spec.commonmark.org/0.31.2/#bullet-list-marker) with `*` bullet markers in [these lecture notes](https://raw.githubusercontent.com/missing-semester/missing-semester/refs/heads/master/_2026/code-quality.md). Note that just replacing all the "-" characters in the file would be incorrect, as there are many uses of that character that are not bullet markers.
-1. Write a regex to capture from JSON structures of the form `{"name": "Alyssa P. Hacker", "college": "MIT"}` the name (e.g., `Alyssa P. Hacker`, in this example). Hint: in your first attempt, you might end up writing a regex that extracts `Alyssa P. Hacker", "college": "MIT`; read about greedy quantifiers in the [Python regex docs](https://docs.python.org/3/library/re.html) to figure out how to fix it.
-    1. Make the regex pattern work even in situations where the name has a `"` character in it (double quotes can be escaped in JSON with `\"`).
-    1. We do **not** recommend using regular expressions for sophisticated parsing problems in practice. Figure out how to use your programming language's JSON parser for this task. Write a command-line program that takes as input, on stdin, a JSON structure of the form described above, and output, on stdout, the name. You should only need a couple lines of code to do this. In Python, you can do it easily in one line of code beyond `import json`.
+- Log format ను విశ్లేషించగలదు
+- అవసరమైన భాగాన్ని గుర్తించగలదు
+- సరైన Regex pattern ను సూచించగలదు
+
+అయితే, AI రూపొందించిన Regex ను నేరుగా నమ్మకుండా:
+
+- అది ఎలా పనిచేస్తుందో అర్థం చేసుకోవడం
+- వివిధ inputs పై పరీక్షించడం
+- Edge cases ను పరిశీలించడం
+
+మంచి అలవాటు.
+
+Regex విషయంలో AI ను "సహాయక సాధనం" (assistant) గా ఉపయోగించడం ఉత్తమం; "అంతిమ సత్యం" (source of truth) గా కాదు.
+
+# అభ్యాసాలు (Exercises)
+
+1. మీరు ప్రస్తుతం పని చేస్తున్న project కోసం ఒక Formatter, Linter మరియు Pre-commit Hooks ను configure చేయండి.
+
+   Errors ఎక్కువగా ఉంటే:
+
+   - Formatting errors ను Autoformatter ద్వారా సరిచేయండి.
+   - Linter errors ను సరిచేయడానికి ఒక [AI Agent](/2026/agentic-coding/) ను ఉపయోగించి చూడండి.
+
+   ముఖ్యంగా:
+
+   - AI Agent కు linter ను run చేసే అవకాశం ఇవ్వండి.
+   - Linter results ను చదవగలిగేలా చేయండి.
+   - తద్వారా అది iterative loop లో errors ను సరిచేయగలదు.
+
+   చివరగా, ఫలితాలను జాగ్రత్తగా పరిశీలించండి.
+
+   AI code ను సరిచేస్తూ కొత్త bugs ను సృష్టించలేదని నిర్ధారించుకోండి.
+
+2. మీకు తెలిసిన programming language లోని ఒక testing library ను నేర్చుకోండి.
+
+   మీరు పని చేస్తున్న project కోసం ఒక Unit Test రాయండి.
+
+   తర్వాత:
+
+   - Code Coverage Tool ను run చేయండి
+   - HTML Coverage Report ను generate చేయండి
+   - ఫలితాలను పరిశీలించండి
+
+   ఆలోచించండి:
+
+   - ఏ lines cover అయ్యాయి?
+   - Coverage ఎంత ఉంది?
+
+   సాధారణంగా మొదట్లో coverage చాలా తక్కువగా ఉంటుంది.
+
+   Coverage పెంచడానికి:
+
+   - కొన్ని tests ను స్వయంగా రాయండి
+   - తర్వాత [AI Agent](/2026/agentic-coding/) సహాయంతో coverage ను మెరుగుపరచడానికి ప్రయత్నించండి
+
+   Agent కు:
+
+   - Coverage తో tests run చేసే అవకాశం
+   - Line-by-line coverage report చూసే అవకాశం
+
+   ఇవ్వండి.
+
+   తర్వాత పరిశీలించండి:
+
+   - AI రూపొందించిన tests నిజంగా మంచి tests అవునా?
+   - లేక కేవలం coverage percentage పెంచడానికి మాత్రమే రాయబడినవా?
+
+3. మీరు పని చేస్తున్న project కోసం Continuous Integration (CI) ను configure చేయండి.
+
+   ప్రతి `git push` పై CI run అయ్యేలా ఏర్పాటు చేయండి.
+
+   CI ద్వారా:
+
+   - Formatting Checks
+   - Linting
+   - Tests
+
+   run చేయండి.
+
+   తర్వాత ఉద్దేశపూర్వకంగా (intentionally) code ను చెడగొట్టండి.
+
+   ఉదాహరణకు:
+
+   - ఒక Linter violation ను చేర్చండి
+
+   CI ఆ సమస్యను గుర్తిస్తుందో లేదో నిర్ధారించండి.
+
+4. ఒక [Regex Pattern](#regular-expressions) రాసి, `grep` [Command-Line Tool](/2026/course-shell/) ను ఉపయోగించి మీ code లో:
+
+   ```python
+   subprocess.Popen(..., shell=True)
+   ```
+
+   occurrences ను కనుగొనండి.
+
+   తర్వాత:
+
+   - Regex ను "break" చేయడానికి ప్రయత్నించండి
+   - అనూహ్య formatting లేదా code styles ను ఉపయోగించండి
+
+   ఇప్పుడు [semgrep](#linting) ను ఉపయోగించి చూడండి.
+
+   మీ `grep` pattern విఫలమైనా, semgrep ప్రమాదకరమైన code ను ఇంకా గుర్తించగలుగుతుందా?
+
+5. మీ IDE లేదా Text Editor లో Regex Search-and-Replace అభ్యాసం చేయండి.
+
+   ఈ lecture notes లోని:
+
+   ```markdown
+   -
+   ```
+
+   Markdown Bullet Markers ను:
+
+   ```markdown
+   *
+   ```
+
+   గా మార్చండి.
+
+   గమనిక:
+
+   File లోని అన్ని `-` characters ను blind replace చేయడం సరైంది కాదు.
+
+   ఎందుకంటే:
+
+   - Dates
+   - Hyphenated Words
+   - Command Options
+   - URLs
+
+   వంటి అనేక చోట్ల `-` వేరే అర్థంలో ఉపయోగించబడుతుంది.
+
+   కాబట్టి, నిజమైన Markdown Bullet Markers ను మాత్రమే గుర్తించే Regex ను రూపొందించండి.
+
+6. ఈ JSON structure నుండి:
+
+   ```json
+   {"name": "Alyssa P. Hacker", "college": "MIT"}
+   ```
+
+   `name` value ను capture చేసే Regex ను రాయండి.
+
+   ఉదాహరణకు:
+
+   ```text
+   Alyssa P. Hacker
+   ```
+
+   ను extract చేయాలి.
+
+   **సూచన:**
+
+   మొదటి ప్రయత్నంలో మీరు ఇలా పొరపాటు చేయవచ్చు:
+
+   ```text
+   Alyssa P. Hacker", "college": "MIT
+   ```
+
+   వంటి ఫలితం రావచ్చు.
+
+   దీనిని సరిచేయడానికి Python Regex Documentation లోని **Greedy Quantifiers** గురించి చదవండి.
+
+   ### 6.1
+
+   Name లో `"` character ఉన్న సందర్భాలను కూడా handle చేసేలా Regex ను మెరుగుపరచండి.
+
+   JSON లో double quotes ను ఇలా escape చేయవచ్చు:
+
+   ```json
+   \" 
+   ```
+
+   కాబట్టి Regex ఈ పరిస్థితిని కూడా సరిగ్గా handle చేయాలి.
+
+   ### 6.2
+
+   వాస్తవ ప్రపంచంలో (practical software development లో), క్లిష్టమైన parsing సమస్యలకు Regex ఉపయోగించడం **సిఫారసు చేయబడదు**.
+
+   ఈ task ను మీ programming language లోని JSON Parser ఉపయోగించి చేయడం నేర్చుకోండి.
+
+   ఒక చిన్న Command-Line Program రాయండి:
+
+   - Input: `stdin` ద్వారా JSON
+   - Output: `stdout` ద్వారా name value
+
+   ఇది చాలా చిన్న program అవుతుంది.
+
+   Python లో అయితే:
+
+   ```python
+   import json
+   ```
+
+   తర్వాత కేవలం ఒక line code తోనే ఈ పని చేయవచ్చు.
